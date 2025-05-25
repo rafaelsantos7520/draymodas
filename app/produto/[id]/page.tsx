@@ -176,6 +176,8 @@ export default function ProdutoPage() {
                   <Button className="w-full bg-green-600 hover:bg-green-700 text-white py-6 text-lg">
                   Quero este produto
                 </Button>
+
+
                 </a>
                 <p className="text-sm text-muted-foreground italic mt-2">
                   * Este é apenas um catálogo para visualização. Para
