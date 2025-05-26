@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import { Filter, ChevronDown, SlidersHorizontal, X } from "lucide-react";
 import axios from "axios";
 
@@ -38,6 +38,12 @@ export default function CatalogoPage() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const sheetTriggerRef = useRef<any>(null);
   const [isCategoryLoading, setIsCategoryLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const ITEMS_PER_PAGE = 20;
+
+  // Cache para produtos
+  const productsCache = useRef<Map<string, any[]>>(new Map());
 
   // Estados para inputs (edição)
   const [editCategory, setEditCategory] = useState<string | null>(null);
@@ -53,48 +59,77 @@ export default function CatalogoPage() {
   });
   const [appliedSizes, setAppliedSizes] = useState<string[]>([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
+  const fetchData = useCallback(
+    async (pageNum: number = 1, filters: any = {}) => {
       try {
+        const cacheKey = JSON.stringify({ page: pageNum, ...filters });
+
+        if (productsCache.current.has(cacheKey)) {
+          const cachedProducts = productsCache.current.get(cacheKey);
+          setProducts(cachedProducts || []);
+          return;
+        }
+
+        const queryParams = new URLSearchParams({
+          page: pageNum.toString(),
+          limit: ITEMS_PER_PAGE.toString(),
+          ...filters,
+        });
+
         const [productsRes, categoriesRes, sizesRes] = await Promise.all([
-          axios.get("/api/admin/products"),
+          axios.get(`/api/products?${queryParams.toString()}`),
           axios.get("/api/admin/categories"),
           axios.get("/api/admin/sizes"),
         ]);
-        setProducts(productsRes.data);
-        setCategories(categoriesRes.data);
-        setSizes(sizesRes.data);
+
+        // A resposta da API /api/products já retorna o array de produtos diretamente
+        const newProducts = productsRes.data || [];
+        setProducts(
+          pageNum === 1 ? newProducts : [...(products || []), ...newProducts]
+        );
+        setHasMore(newProducts.length === ITEMS_PER_PAGE);
+
+        // Atualizar cache
+        productsCache.current.set(cacheKey, newProducts);
+
+        if (pageNum === 1) {
+          setCategories(categoriesRes.data || []);
+          setSizes(sizesRes.data || []);
+        }
       } catch (error) {
         console.error("Erro ao carregar dados:", error);
+        setProducts([]);
+        setHasMore(false);
       } finally {
         setLoading(false);
       }
-    };
+    },
+    [products]
+  );
+
+  useEffect(() => {
     fetchData();
   }, []);
 
-  const handleCategoryChange = async (categoryId: string) => {
-    setIsCategoryLoading(true);
-    setEditCategory(categoryId);
-    setAppliedCategory(categoryId);
-    setFilterLoading(true);
-    try {
-      const queryParams = new URLSearchParams();
-      if (categoryId) queryParams.append("categoryId", categoryId);
-      if (editPriceRange.min)
-        queryParams.append("minPrice", editPriceRange.min);
-      if (editPriceRange.max)
-        queryParams.append("maxPrice", editPriceRange.max);
-      editSizes.forEach((id) => queryParams.append("sizeId", id));
-      const res = await axios.get(`/api/products?${queryParams.toString()}`);
-      setProducts(res.data);
-    } catch (error) {
-      console.error("Erro ao filtrar por categoria:", error);
-    } finally {
-      setFilterLoading(false);
-      setIsCategoryLoading(false);
-    }
-  };
+  const handleCategoryChange = useCallback(
+    async (categoryId: string) => {
+      setIsCategoryLoading(true);
+      setEditCategory(categoryId);
+      setAppliedCategory(categoryId);
+      setFilterLoading(true);
+      setPage(1);
+
+      try {
+        await fetchData(1, { categoryId });
+      } catch (error) {
+        console.error("Erro ao filtrar por categoria:", error);
+      } finally {
+        setFilterLoading(false);
+        setIsCategoryLoading(false);
+      }
+    },
+    [fetchData]
+  );
 
   const handlePriceInput = (type: "min" | "max", value: string) => {
     setEditPriceRange({
@@ -111,18 +146,17 @@ export default function CatalogoPage() {
     );
   };
 
-  const handlePriceFilter = async () => {
+  const handlePriceFilter = useCallback(async () => {
     setFilterLoading(true);
-    try {
-      const queryParams = new URLSearchParams();
-      if (editPriceRange.min)
-        queryParams.append("minPrice", editPriceRange.min);
-      if (editPriceRange.max)
-        queryParams.append("maxPrice", editPriceRange.max);
-      editSizes.forEach((id) => queryParams.append("sizeId", id));
+    setPage(1);
 
-      const res = await axios.get(`/api/products?${queryParams.toString()}`);
-      setProducts(res.data);
+    try {
+      await fetchData(1, {
+        minPrice: editPriceRange.min,
+        maxPrice: editPriceRange.max,
+        sizeIds: editSizes,
+      });
+
       setAppliedPriceRange({ ...editPriceRange });
       setAppliedSizes([...editSizes]);
       setIsSheetOpen(false);
@@ -131,22 +165,23 @@ export default function CatalogoPage() {
     } finally {
       setFilterLoading(false);
     }
-  };
+  }, [editPriceRange, editSizes, fetchData]);
 
-  const handleSearch = async () => {
+  const handleSearch = useCallback(async () => {
     setSearchLoading(true);
+    setPage(1);
+
     try {
-      const res = await axios.get(`/api/products?search=${searchQuery}`);
-      setProducts(res.data);
+      await fetchData(1, { search: searchQuery });
       setAppliedSearch(searchQuery);
     } catch (error) {
       console.error("Erro na busca:", error);
     } finally {
       setSearchLoading(false);
     }
-  };
+  }, [searchQuery, fetchData]);
 
-  const handleClearFilters = async () => {
+  const handleClearFilters = useCallback(async () => {
     setEditCategory(null);
     setEditPriceRange({ min: "", max: "" });
     setEditSizes([]);
@@ -155,16 +190,17 @@ export default function CatalogoPage() {
     setAppliedPriceRange({ min: "", max: "" });
     setAppliedSizes([]);
     setAppliedSearch("");
+    setPage(1);
     setLoading(true);
+
     try {
-      const res = await axios.get("/api/admin/products");
-      setProducts(res.data);
+      await fetchData(1);
     } catch (error) {
       console.error("Erro ao limpar filtros:", error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [fetchData]);
 
   // Skeleton para card de produto
   function ProductCardSkeleton() {
@@ -181,6 +217,60 @@ export default function CatalogoPage() {
       </div>
     );
   }
+
+  // Memoize o grid de produtos
+  const productGrid = useMemo(
+    () => (
+      <div className="grid grid-cols-1 gap-4 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 mt-6">
+        {filterLoading ? (
+          Array.from({ length: 8 }).map((_, idx) => (
+            <ProductCardSkeleton key={idx} />
+          ))
+        ) : (products || []).length > 0 ? (
+          (products || []).map((product: any) => (
+            <div
+              key={product.id}
+              className="group relative overflow-hidden rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 bg-white mx-auto w-full max-w-xs"
+            >
+              <Link
+                href={`/produto/${product.id}`}
+                className="absolute inset-0 z-10"
+              >
+                <span className="sr-only">{product.name}</span>
+              </Link>
+              <div className="relative aspect-[3/4] md:aspect-[2/3]">
+                <Image
+                  src={product.images?.[0]?.url || "/placeholder.svg"}
+                  alt={product.name}
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  loading="lazy"
+                />
+              </div>
+              <div className="p-2 sm:p-3">
+                <h3 className="font-semibold text-base line-clamp-1">
+                  {product.name}
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  {product.category?.name}
+                </p>
+                <p className="text-base font-bold text-primary mt-1">
+                  R$ {product.price?.toFixed(2)}
+                </p>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="col-span-full text-center py-12">
+            <p className="text-muted-foreground text-lg">
+              Nenhum produto encontrado.
+            </p>
+          </div>
+        )}
+      </div>
+    ),
+    [products, filterLoading]
+  );
 
   if (loading) {
     return (
@@ -389,52 +479,22 @@ export default function CatalogoPage() {
                 </Button>
               </div>
             )}
-            <div className="grid grid-cols-1 gap-4 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 mt-6">
-              {filterLoading ? (
-                Array.from({ length: 8 }).map((_, idx) => (
-                  <ProductCardSkeleton key={idx} />
-                ))
-              ) : products.length > 0 ? (
-                products.map((product: any) => (
-                  <div
-                    key={product.id}
-                    className="group relative overflow-hidden rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 bg-white mx-auto w-full max-w-xs"
-                  >
-                    <Link
-                      href={`/produto/${product.id}`}
-                      className="absolute inset-0 z-10"
-                    >
-                      <span className="sr-only">{product.name}</span>
-                    </Link>
-                    <div className="relative aspect-[3/4] md:aspect-[2/3]">
-                      <Image
-                        src={product.images?.[0]?.url || "/placeholder.svg"}
-                        alt={product.name}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
-                    <div className="p-2 sm:p-3">
-                      <h3 className="font-semibold text-base line-clamp-1">
-                        {product.name}
-                      </h3>
-                      <p className="text-xs text-muted-foreground">
-                        {product.category?.name}
-                      </p>
-                      <p className="text-base font-bold text-primary mt-1">
-                        R$ {product.price?.toFixed(2)}
-                      </p>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="col-span-full text-center py-12">
-                  <p className="text-muted-foreground text-lg">
-                    Nenhum produto encontrado.
-                  </p>
-                </div>
-              )}
-            </div>
+            {productGrid}
+
+            {hasMore && !filterLoading && (
+              <div className="flex justify-center mt-8">
+                <Button
+                  onClick={() => {
+                    const nextPage = page + 1;
+                    setPage(nextPage);
+                    fetchData(nextPage);
+                  }}
+                  className="bg-primary text-white"
+                >
+                  Carregar mais
+                </Button>
+              </div>
+            )}
           </div>
         </section>
       </main>

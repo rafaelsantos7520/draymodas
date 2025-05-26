@@ -4,34 +4,39 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { ChevronLeft, X } from "lucide-react";
-import axios from "axios";
+import useSWR from "swr";
 import { Button } from "@/components/ui/button";
 import { LoadingComponent } from "@/components/LoadingComponent";
+
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  images: { url: string }[];
+}
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
 export default function ProdutoPage() {
   const { id } = useParams();
-  const [product, setProduct] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [modalOpen, setModalOpen] = useState(false);
-  const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
-  useEffect(() => {
-    if (!id) return;
-    const fetchProduct = async () => {
-      try {
-        const res = await axios.get(`/api/products/${id}`);
-        setProduct(res.data.product);
-        setRelatedProducts(res.data.relatedProducts);
-      } catch (error) {
-        console.error("Erro ao buscar produto:", error);
-        setProduct(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProduct();
-  }, [id]);
 
-  if (loading) {
+  const { data, error, isLoading } = useSWR(
+    id ? `/api/products/${id}` : null,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      refreshInterval: 300000, // revalida a cada 5 minutos
+      dedupingInterval: 60000, // deduplica requisições dentro de 1 minuto
+    }
+  );
+
+  const product = data?.product;
+  const relatedProducts = data?.relatedProducts || [];
+
+  if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <LoadingComponent text="Carregando produto..." />
@@ -39,7 +44,7 @@ export default function ProdutoPage() {
     );
   }
 
-  if (!product) {
+  if (error || !product) {
     return (
       <div className="flex flex-col min-h-screen">
         <main className="flex-1 flex items-center justify-center">
@@ -174,10 +179,8 @@ export default function ProdutoPage() {
                   className="w-full"
                 >
                   <Button className="w-full bg-green-600 hover:bg-green-700 text-white py-6 text-lg">
-                  Quero este produto
-                </Button>
-
-
+                    Quero este produto
+                  </Button>
                 </a>
                 <p className="text-sm text-muted-foreground italic mt-2">
                   * Este é apenas um catálogo para visualização. Para
@@ -194,7 +197,7 @@ export default function ProdutoPage() {
               Você também pode gostar
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {relatedProducts.map((relatedProduct) => (
+              {relatedProducts.map((relatedProduct: Product) => (
                 <div
                   key={relatedProduct.id}
                   className="bg-white rounded-lg shadow-md p-4"

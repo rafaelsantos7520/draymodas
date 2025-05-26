@@ -35,6 +35,7 @@ export default async function Page() {
     },
   })) as ProductWithRelations[];
 
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex justify-between items-center mb-4">

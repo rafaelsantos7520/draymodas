@@ -4,7 +4,8 @@ import Image from "next/image";
 import { ChevronRight, Star, Heart, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useEffect, useState } from "react";
+import { useEffect, useState, memo, useMemo } from "react";
+import useSWR from "swr";
 import axios from "axios";
 import {
   Carousel,
@@ -16,16 +17,93 @@ import {
 import Autoplay from "embla-carousel-autoplay";
 import { FloatingWhatsApp } from "react-floating-whatsapp";
 
-export default function Home() {
-  const [produtos, setProdutos] = useState<any[]>([]);
+// Componente de produto memoizado
+const ProductCard = memo(
+  ({ product }: { product: any }) => {
+    const [imageLoaded, setImageLoaded] = useState(false);
 
-  useEffect(() => {
-    const fetchFeaturedProducts = async () => {
-      const res = await axios.get("/api/products/home");
-      setProdutos(res.data);
-    };
-    fetchFeaturedProducts();
-  }, []);
+    return (
+      <div className="group relative overflow-hidden rounded-2xl border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-white transform hover:-translate-y-2">
+        <Link href={`/produto/${product.id}`} className="absolute inset-0 z-10">
+          <span className="sr-only">{product.name}</span>
+        </Link>
+
+        <div className="relative overflow-hidden">
+          <div
+            className={`absolute inset-0 bg-gray-100 ${
+              imageLoaded ? "opacity-0" : "opacity-100"
+            } transition-opacity duration-300`}
+          />
+          <Image
+            src={product.images[0]?.url || "/placeholder.svg"}
+            alt={product.name}
+            width={350}
+            height={450}
+            className={`object-cover w-full aspect-[3/4] transition-transform duration-700 group-hover:scale-110 ${
+              imageLoaded ? "opacity-100" : "opacity-0"
+            }`}
+            loading="lazy"
+            quality={75}
+            onLoad={() => setImageLoaded(true)}
+            priority={false}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        </div>
+
+        <div className="p-4 space-y-2">
+          <h3 className="font-semibold text-primary text-lg truncate group-hover:text-emerald-600 transition-colors">
+            {product.name}
+          </h3>
+          <div className="text-sm text-gray-500 flex items-center gap-1">
+            <Badge variant="secondary" className="text-xs">
+              {product.category?.name || "Sem categoria"}
+            </Badge>
+          </div>
+          <div className="flex items-center justify-between pt-2">
+            <div className="flex items-center gap-1">
+              {[...Array(5)].map((_, i) => (
+                <Star
+                  key={i}
+                  className="h-3 w-3 fill-yellow-400 text-yellow-400"
+                />
+              ))}
+              <span className="text-xs text-gray-500 ml-1">(4.9)</span>
+            </div>
+            <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-primary transition-colors" />
+          </div>
+        </div>
+      </div>
+    );
+  },
+  (prevProps, nextProps) => prevProps.product.id === nextProps.product.id
+);
+
+ProductCard.displayName = "ProductCard";
+
+// Função fetcher para SWR
+const fetcher = (url: string) => axios.get(url).then((res) => res.data);
+
+export default function Home() {
+  // Configuração otimizada do SWR com cache
+  const { data: produtos = [], error } = useSWR("/api/products/home", fetcher, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+    dedupingInterval: 300000, // 5 minutos
+    refreshInterval: 300000, // 5 minutos
+    fallbackData: [], // Evita loading state
+    suspense: false,
+    keepPreviousData: true, // Mantém dados anteriores enquanto carrega novos
+    onError: (err) => {
+      console.error("Erro ao carregar produtos:", err);
+    },
+  });
+
+  // Memoização dos produtos para evitar re-renders desnecessários
+  const memoizedProducts = useMemo(() => produtos, [produtos]);
+
+  if (error) {
+    console.error("Erro ao carregar produtos:", error);
+  }
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -94,6 +172,7 @@ export default function Home() {
                     height={600}
                     className="relative rounded-2xl object-cover shadow-2xl transform group-hover:scale-105 transition-transform duration-500"
                     priority
+                    quality={85}
                   />
                   <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
                     Novo
@@ -103,6 +182,7 @@ export default function Home() {
             </div>
           </div>
         </section>
+
         <section className="w-full py-16 md:py-24 lg:py-32 bg-gradient-to-b from-gray-50 to-white">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-6 text-center mb-12">
@@ -129,55 +209,12 @@ export default function Home() {
                   plugins={[Autoplay({ delay: 4000 })]}
                 >
                   <CarouselContent className="-ml-6">
-                    {produtos.map((product, index) => (
+                    {memoizedProducts.map((product: any) => (
                       <CarouselItem
                         key={product.id}
                         className="pl-6 md:basis-1/2 lg:basis-1/3"
                       >
-                        <div className="group relative overflow-hidden rounded-2xl border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-white transform hover:-translate-y-2">
-                          <Link
-                            href={`/produto/${product.id}`}
-                            className="absolute inset-0 z-10"
-                          >
-                            <span className="sr-only">{product.name}</span>
-                          </Link>
-
-                          <div className="relative overflow-hidden">
-                            <Image
-                              src={product.images[0]?.url || "/placeholder.svg"}
-                              alt={product.name}
-                              width={350}
-                              height={450}
-                              className="object-cover w-full aspect-[3/4] transition-transform duration-700 group-hover:scale-110"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                          </div>
-
-                          <div className="p-4 space-y-2">
-                            <h3 className="font-semibold text-primary text-lg truncate group-hover:text-emerald-600 transition-colors">
-                              {product.name}
-                            </h3>
-                            <div className="text-sm text-gray-500 flex items-center gap-1">
-                              <Badge variant="secondary" className="text-xs">
-                                {product.category?.name || "Sem categoria"}
-                              </Badge>
-                            </div>
-                            <div className="flex items-center justify-between pt-2">
-                              <div className="flex items-center gap-1">
-                                {[...Array(5)].map((_, i) => (
-                                  <Star
-                                    key={i}
-                                    className="h-3 w-3 fill-yellow-400 text-yellow-400"
-                                  />
-                                ))}
-                                <span className="text-xs text-gray-500 ml-1">
-                                  (4.9)
-                                </span>
-                              </div>
-                              <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-primary transition-colors" />
-                            </div>
-                          </div>
-                        </div>
+                        <ProductCard product={product} />
                       </CarouselItem>
                     ))}
                   </CarouselContent>
@@ -201,6 +238,7 @@ export default function Home() {
             </div>
           </div>
         </section>
+
         {/* Sobre nós - Versão melhorada */}
         <section className="w-full py-16 bg-primary text-white">
           <div className="container px-4 md:px-6">
@@ -240,11 +278,14 @@ export default function Home() {
                   width={500}
                   height={400}
                   className="rounded-2xl shadow-2xl"
+                  loading="lazy"
+                  quality={75}
                 />
               </div>
             </div>
           </div>
         </section>
+
         {/* Depoimentos - Versão melhorada */}
         <section className="w-full py-16 bg-gradient-to-b from-white to-gray-50">
           <div className="container px-4 md:px-6">

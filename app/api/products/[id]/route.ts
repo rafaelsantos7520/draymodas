@@ -1,34 +1,16 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 
-const prisma = new PrismaClient();
+export const revalidate = 3600; // revalida a cada 1 hora
 
-type Params = Promise<{ id: string }>;
-
-export async function GET(request: Request, segmentData: { params: Params }) {
-  const { id } = await segmentData.params;
-
-  // Buscar o produto principal
-  const product = await prisma.product.findUnique({
-    where: { id: id },
-    include: {
-      category: true,
-      images: true,
-      sizes: {
-        include: {
-          size: true,
-        },
-      },
-    },
-  });
-
-  // Buscar produtos da mesma categoria (excluindo o produto atual)
-  let relatedProducts: any[] = [];
-  if (product && product.categoryId) {
-    relatedProducts = await prisma.product.findMany({
+export async function GET(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const product = await prisma.product.findUnique({
       where: {
-        categoryId: product.categoryId,
-        id: { not: id },
+        id: params.id,
       },
       include: {
         category: true,
@@ -39,9 +21,32 @@ export async function GET(request: Request, segmentData: { params: Params }) {
           },
         },
       },
-      take: 5, // Limite de produtos relacionados
     });
-  }
 
-  return NextResponse.json({ product, relatedProducts });
+    if (!product) {
+      return new NextResponse("Produto não encontrado", { status: 404 });
+    }
+
+    // Busca produtos relacionados da mesma categoria
+    const relatedProducts = await prisma.product.findMany({
+      where: {
+        categoryId: product.categoryId,
+        id: {
+          not: product.id,
+        },
+      },
+      include: {
+        images: true,
+      },
+      take: 3,
+    });
+
+    return NextResponse.json({
+      product,
+      relatedProducts,
+    });
+  } catch (error) {
+    console.error("Erro ao buscar produto:", error);
+    return new NextResponse("Erro interno do servidor", { status: 500 });
+  }
 }
