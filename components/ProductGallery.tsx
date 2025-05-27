@@ -29,7 +29,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
               <X className="w-6 h-6 text-gray-700" />
             </button>
             <Image
-              src={images?.[selectedIndex]?.url || "/placeholder.svg"}
+              src={images?.[selectedIndex]?.url || "/productCardDefault.png"}
               alt={`${productName} - Imagem ampliada`}
               width={700}
               height={900}
@@ -45,7 +45,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
           onClick={() => setModalOpen(true)}
         >
           <Image
-            src={images?.[selectedIndex]?.url || "/placeholder.svg"}
+            src={images?.[selectedIndex]?.url || "/productCardDefault.png"}
             alt={`${productName} - Imagem ${selectedIndex + 1}`}
             width={400}
             height={500}
@@ -66,7 +66,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
                 style={{ background: "#fff" }}
               >
                 <Image
-                  src={img.url || "/placeholder.svg"}
+                  src={img.url || "/productCardDefault.png"}
                   alt={`Miniatura ${idx + 1}`}
                   width={60}
                   height={60}

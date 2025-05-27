@@ -1,69 +1,97 @@
-export const revalidate = 86400; // 24 horas
+"use client";
 
-  import Link from "next/link";
-  import { ChevronLeft } from "lucide-react";
-  import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import useSWR from "swr";
+import { notFound } from "next/navigation";
+import { ProductGallery } from "@/components/ProductGallery";
+import { ProductDetails } from "@/components/ProductDetails";
+import { ProductCard } from "@/components/ProductCard";
+import { ProductWithRelations } from "@/types/product";
+import Loading from "./loading";
 
-  import { getProductWithRelated } from "@/lib/services/product.service";
-  import { notFound } from "next/navigation";
-  import { ProductGallery } from "@/components/ProductGallery";
-  import { ProductDetails } from "@/components/ProductDetails";
-  import { ProductCard } from "@/components/ProductCard";
+interface ProductResponse {
+  product: ProductWithRelations;
+  relatedProducts: ProductWithRelations[];
+}
 
-  interface PageProps {
-    params: {
-      id: string;
-    };
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
+interface PageProps {
+  params: {
+    id: string;
+  };
+}
+
+export default function ProdutoPage({ params }: PageProps) {
+  const { data, error, isLoading } = useSWR<ProductResponse>(
+    `/api/products/${params.id}`,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: 3600000, // 1 hora
+    }
+  );
+
+  if (error) {
+    return <div>Erro ao carregar o produto</div>;
   }
 
-  export default async function ProdutoPage({ params }: PageProps) {
-    const data = await getProductWithRelated(params.id);
-
-    if (!data) {
-      notFound();
-    }
-
-    const { product, relatedProducts } = data;
-
+  if (isLoading) {
     return (
-      <div className="flex flex-col min-h-screen">
-        <main className="flex-1">
-          <div className="container px-4 py-12 md:px-6">
-            <div className="mb-6">
-              <Link href="/catalogo">
-                <Button variant="outline" className="flex items-center gap-2">
-                  <ChevronLeft className="h-4 w-4" />
-                  Voltar para o catálogo
-                </Button>
-              </Link>
-            </div>
-            <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-start bg-white rounded-lg shadow-md p-4 md:p-8">
-              <ProductGallery
-                images={product.images}
-                productName={product.name}
-              />
-              <ProductDetails
-                name={product.name}
-                category={product.category}
-                description={product.description}
-                price={product.price}
-                sizes={product.sizes}
-              />
-            </div>
-          </div>
-          {relatedProducts.length > 0 && (
-            <div className="mt-16">
-              <h2 className="text-2xl font-bold text-gray-900 mb-8">
-                Produtos Relacionados
-              </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {relatedProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </div>
-            </div>
-          )}
-        </main>
+      <div className="flex justify-center items-center h-screen">
+        <Loading />
       </div>
     );
   }
+
+  if (!data) {
+    notFound();
+  }
+
+  const { product, relatedProducts } = data;
+
+  return (
+    <div className="flex flex-col min-h-screen">
+      <main className="flex-1">
+        <div className="container px-4 py-12 md:px-6">
+          <div className="mb-6">
+            <Link href="/catalogo">
+              <Button variant="outline" className="flex items-center gap-2">
+                <ChevronLeft className="h-4 w-4" />
+                Voltar para o catálogo
+              </Button>
+            </Link>
+          </div>
+          <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-start bg-white rounded-lg shadow-md p-4 md:p-8">
+            <ProductGallery
+              images={product.images}
+              productName={product.name}
+            />
+            <ProductDetails
+              name={product.name}
+              category={product.category}
+              description={product.description}
+              price={product.price}
+              sizes={product.sizes}
+            />
+          </div>
+        </div>
+        {relatedProducts.length > 0 && (
+          <div className="mt-16">
+            <h2 className="text-2xl font-bold text-gray-900 mb-8">
+              Produtos Relacionados
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {relatedProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}

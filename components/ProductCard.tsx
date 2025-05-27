@@ -21,7 +21,7 @@ export const ProductCard = memo(function ProductCard({
       <div className="group relative overflow-hidden rounded-lg border bg-white shadow-sm transition-all hover:shadow-md">
         <div className="relative aspect-square overflow-hidden">
           <Image
-            src={product.images[0]?.url || "/placeholder.png"}
+            src={product.images[0]?.url || "/productCardDefault.png"}
             alt={product.name}
             fill
             className={`object-cover transition-opacity duration-300 ${
