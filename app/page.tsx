@@ -4,15 +4,7 @@ import { FeaturedProducts } from "../components/FeaturedProducts";
 import { AboutSection } from "../components/AboutSection";
 import { TestimonialsSection } from "../components/TestimonialsSection";
 import { getProductFeatured } from "@/lib/services/product.service";
-import { Product, Category, Image, ProductSize, Size } from "@prisma/client";
-
-type ProductWithRelations = Product & {
-  category: Category;
-  images: Image[];
-  sizes: (ProductSize & {
-    size: Size;
-  })[];
-};
+import { ProductWithRelations } from "@/types/product";
 
 export default async function Home() {
   const produtos = await getProductFeatured();

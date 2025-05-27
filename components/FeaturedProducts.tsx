@@ -13,17 +13,10 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
-import { Product, Category, Image as ImageType, ProductSize, Size } from "@prisma/client";
+import { ProductWithRelations } from "@/types/product";
 
-type ProductWithRelations = Product & {
-  category: Category;
-  images: ImageType[];
-  sizes: (ProductSize & {
-    size: Size;
-  })[];
-};
 interface FeaturedProductsProps {
-    products: ProductWithRelations[];
+  products: ProductWithRelations[];
 }
 
 export function FeaturedProducts({ products }: FeaturedProductsProps) {

@@ -24,6 +24,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LoadingComponent } from "@/components/LoadingComponent";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ProductCard } from "@/components/ProductCard";
 
 export default function CatalogoPage() {
   const [products, setProducts] = useState<any[]>([]);
@@ -228,37 +229,7 @@ export default function CatalogoPage() {
           ))
         ) : (products || []).length > 0 ? (
           (products || []).map((product: any) => (
-            <div
-              key={product.id}
-              className="group relative overflow-hidden rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 bg-white mx-auto w-full max-w-xs"
-            >
-              <Link
-                href={`/produto/${product.id}`}
-                className="absolute inset-0 z-10"
-              >
-                <span className="sr-only">{product.name}</span>
-              </Link>
-              <div className="relative aspect-[3/4] md:aspect-[2/3]">
-                <Image
-                  src={product.images?.[0]?.url || "/placeholder.svg"}
-                  alt={product.name}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-300"
-                  loading="lazy"
-                />
-              </div>
-              <div className="p-2 sm:p-3">
-                <h3 className="font-semibold text-base line-clamp-1">
-                  {product.name}
-                </h3>
-                <p className="text-xs text-muted-foreground">
-                  {product.category?.name}
-                </p>
-                <p className="text-base font-bold text-primary mt-1">
-                  R$ {product.price?.toFixed(2)}
-                </p>
-              </div>
-            </div>
+            <ProductCard key={product.id} product={product} />
           ))
         ) : (
           <div className="col-span-full text-center py-12">
