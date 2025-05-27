@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 
-function formatDate(date: Date): string {
+function formatDate(date: Date | null | undefined): string {
+  if (!date) return "";
   return date.toISOString();
 }
 

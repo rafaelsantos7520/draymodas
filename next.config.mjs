@@ -13,7 +13,6 @@ const nextConfig = {
     formats: ['image/webp'],
   },
   experimental: {
-    serverActions: true,
     optimizeCss: true,
   },
   compiler: {
