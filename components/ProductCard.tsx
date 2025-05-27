@@ -44,7 +44,7 @@ export const ProductCard = memo(function ProductCard({
 
           <div className="mt-2 flex items-center justify-between">
             <Badge variant="secondary" className="text-xs">
-              {product.category.name}
+              {product.category?.name || "Sem categoria"}
             </Badge>
             <div className="flex items-center">
               <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />

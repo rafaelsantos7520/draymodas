@@ -10,26 +10,31 @@ function formatProduct(product: any) {
     ...product,
     createdAt: formatDate(product.createdAt),
     updatedAt: formatDate(product.updatedAt),
-    category: {
-      ...product.category,
-      createdAt: formatDate(product.category.createdAt),
-      updatedAt: formatDate(product.category.updatedAt),
-    },
-    images: product.images.map((image: any) => ({
-      ...image,
-      createdAt: formatDate(image.createdAt),
-      updatedAt: formatDate(image.updatedAt),
-    })),
+    category: product.category
+      ? {
+          ...product.category,
+          createdAt: formatDate(product.category.createdAt),
+          updatedAt: formatDate(product.category.updatedAt),
+        }
+      : null,
+    images:
+      product.images?.map((image: any) => ({
+        ...image,
+        createdAt: formatDate(image.createdAt),
+        updatedAt: formatDate(image.updatedAt),
+      })) || [],
     sizes:
       product.sizes?.map((size: any) => ({
         ...size,
         createdAt: formatDate(size.createdAt),
         updatedAt: formatDate(size.updatedAt),
-        size: {
-          ...size.size,
-          createdAt: formatDate(size.size.createdAt),
-          updatedAt: formatDate(size.size.updatedAt),
-        },
+        size: size.size
+          ? {
+              ...size.size,
+              createdAt: formatDate(size.size.createdAt),
+              updatedAt: formatDate(size.size.updatedAt),
+            }
+          : null,
       })) || [],
   };
 }
