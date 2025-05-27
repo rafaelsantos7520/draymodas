@@ -1,3 +1,5 @@
+export const revalidate = 86400; // 24 horas
+
   import Link from "next/link";
   import { ChevronLeft } from "lucide-react";
   import { Button } from "@/components/ui/button";

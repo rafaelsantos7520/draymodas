@@ -1,4 +1,5 @@
-import { FloatingWhatsApp } from "react-floating-whatsapp";
+export const revalidate = 86400; // 24 horas
+
 import { HeroSection } from "../components/HeroSection";
 import { FeaturedProducts } from "../components/FeaturedProducts";
 import { AboutSection } from "../components/AboutSection";
