@@ -21,13 +21,13 @@ interface FeaturedProductsProps {
 
 export function FeaturedProducts({ products }: FeaturedProductsProps) {
   return (
-    <section className="w-full py-16 md:py-24 lg:py-32 bg-gradient-to-b from-gray-50 to-white">
+    <section className="w-full my-12 ">
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center justify-center space-y-6 text-center mb-12">
-          <Badge variant="outline" className="text-primary border-primary">
+          <Badge variant="outline" className="text-emerald-600 border-emerald-600">
             Coleção Especial
           </Badge>
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-primary">
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-emerald-600">
             Destaques da Coleção
           </h2>
           <p className="max-w-[700px] text-gray-600 text-lg leading-relaxed">
@@ -66,7 +66,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
           <Link href="/catalogo">
             <Button
               size="lg"
-              className="bg-primary hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+              className="bg-emerald-600 hover:bg-emerald-600/90 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
             >
               <ShoppingBag className="mr-2 h-5 w-5" />
               Ver Catálogo Completo

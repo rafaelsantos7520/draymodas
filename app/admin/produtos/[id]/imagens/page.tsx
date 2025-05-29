@@ -16,7 +16,7 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2, Upload, X } from "lucide-react";
 import axios from "axios";
-type Params = Promise<{ id: string }>;
+type Params = { id: string };
 
 type PreviewImage = {
   id: string;
@@ -24,8 +24,7 @@ type PreviewImage = {
   file: File;
 };
 
-export default function ProductImagesPage(props: { params: Params }) {
-  const params = use(props.params);
+export default function ProductImagesPage({ params }: { params: Params }) {
   const productId = params.id;
   const router = useRouter();
   const { toast } = useToast();
@@ -163,111 +162,112 @@ export default function ProductImagesPage(props: { params: Params }) {
   }
 
   return (
-    <div className="flex flex-col gap-4 max-w-4xl mx-auto mt-8 p-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Gerenciar Imagens do Produto</h1>
-        <Link href={`/admin/produtos/${productId}/editar`}>
-          <Button variant="outline">Voltar para edição</Button>
-        </Link>
-      </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {loading ? (
-          <div className="col-span-full flex justify-center items-center h-40">
-            <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
-          </div>
-        ) : images.length === 0 ? (
-          <div className="col-span-full text-center text-gray-500 py-8">
-            Nenhuma imagem cadastrada.
-          </div>
-        ) : (
-          images.map((img) => (
-            <div
-              key={img.id}
-              className="relative group aspect-square border rounded-lg overflow-hidden bg-gray-100"
-            >
-              <img
-                src={img.url}
-                alt="Imagem do produto"
-                className="object-cover w-full h-full transition-transform group-hover:scale-105"
-              />
-              <button
-                className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
-                onClick={() => setImageToDelete(img.id)}
-                disabled={loading}
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-          ))
-        )}
-      </div>
-
-      <form className="mt-6 border rounded-lg p-4" onSubmit={handleUpload}>
-        <div className="flex flex-col gap-4">
-          <div>
-            <label className="block mb-2 font-medium">
-              Adicionar novas imagens
-            </label>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handleFileSelect}
-              className="w-full text-sm text-gray-500
-                file:mr-4 file:py-2 file:px-4
-                file:rounded-md file:border-0
-                file:text-sm file:font-semibold
-                file:bg-blue-50 file:text-blue-700
-                hover:file:bg-blue-100"
-            />
-          </div>
-
-          {/* Grid de prévia das imagens */}
-          {previewImages.length > 0 && (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
-              {previewImages.map((preview) => (
-                <div
-                  key={preview.id}
-                  className="relative group aspect-square border rounded-lg overflow-hidden bg-gray-100"
-                >
-                  <img
-                    src={preview.url}
-                    alt="Prévia"
-                    className="object-cover w-full h-full"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removePreviewImage(preview.id)}
-                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-
-          <Button
-            type="submit"
-            disabled={uploading || previewImages.length === 0}
-            className="w-full sm:w-auto"
-          >
-            {uploading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Enviando...
-              </>
-            ) : (
-              <>
-                <Upload className="mr-2 h-4 w-4" />
-                Enviar Imagens
-              </>
-            )}
-          </Button>
+    <div className="container mx-auto px-2 py-6">
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <h1 className="text-xl md:text-2xl font-bold">Gerenciar Imagens do Produto</h1>
+          <Link href={`/admin/produtos/${productId}/editar`}>
+            <Button variant="outline">Voltar para edição</Button>
+          </Link>
         </div>
-      </form>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          {loading ? (
+            <div className="col-span-full flex justify-center items-center h-40">
+              <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
+            </div>
+          ) : images.length === 0 ? (
+            <div className="col-span-full text-center text-gray-500 py-8">
+              Nenhuma imagem cadastrada.
+            </div>
+          ) : (
+            images.map((img) => (
+              <div
+                key={img.id}
+                className="relative group aspect-square border rounded-lg overflow-hidden bg-gray-100"
+              >
+                <img
+                  src={img.url}
+                  alt="Imagem do produto"
+                  className="object-cover w-full h-full transition-transform group-hover:scale-105"
+                />
+                <button
+                  className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={() => setImageToDelete(img.id)}
+                  disabled={loading}
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            ))
+          )}
+        </div>
+
+        <form className="border rounded-lg p-4 sm:p-6" onSubmit={handleUpload}>
+          <div className="flex flex-col gap-4">
+            <div>
+              <label className="block mb-2 font-medium">
+                Adicionar novas imagens
+              </label>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleFileSelect}
+                className="w-full text-sm text-gray-500
+                  file:mr-4 file:py-2 file:px-4
+                  file:rounded-md file:border-0
+                  file:text-sm file:font-semibold
+                  file:bg-blue-50 file:text-blue-700
+                  hover:file:bg-blue-100"
+              />
+            </div>
+
+            {previewImages.length > 0 && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-4">
+                {previewImages.map((preview) => (
+                  <div
+                    key={preview.id}
+                    className="relative group aspect-square border rounded-lg overflow-hidden bg-gray-100"
+                  >
+                    <img
+                      src={preview.url}
+                      alt="Prévia"
+                      className="object-cover w-full h-full"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removePreviewImage(preview.id)}
+                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <Button
+              type="submit"
+              disabled={uploading || previewImages.length === 0}
+              className="w-full sm:w-auto"
+            >
+              {uploading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Enviando...
+                </>
+              ) : (
+                <>
+                  <Upload className="mr-2 h-4 w-4" />
+                  Enviar Imagens
+                </>
+              )}
+            </Button>
+          </div>
+        </form>
+      </div>
 
       <AlertDialog
         open={!!imageToDelete}

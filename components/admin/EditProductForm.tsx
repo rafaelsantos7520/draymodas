@@ -136,18 +136,20 @@ export function EditProductForm({
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col gap-6 max-w-2xl border p-6 rounded-lg shadow-lg bg-white"
+      className="flex flex-col gap-6 w-full max-w-2xl mx-auto border p-4 sm:p-6 rounded-lg shadow-lg bg-white"
     >
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-800">Editar Produto</h2>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
+          Editar Produto
+        </h2>
         <Link
           href={`/admin/produtos/${product.id}/imagens`}
-          className="text-blue-600 hover:text-blue-800 font-medium flex items-center gap-2"
+          className="text-blue-600 hover:text-blue-800 font-medium flex items-center gap-2 text-sm sm:text-base"
         >
           <span>Gerenciar imagens</span>
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5"
+            className="h-4 w-4 sm:h-5 sm:w-5"
             viewBox="0 0 20 20"
             fill="currentColor"
           >
@@ -161,12 +163,12 @@ export function EditProductForm({
       </div>
 
       {submitError && (
-        <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md">
+        <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
           {submitError}
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
         <div className="flex flex-col gap-2">
           <Label className="text-sm font-medium text-gray-700">Nome</Label>
           <Input
@@ -182,6 +184,7 @@ export function EditProductForm({
           <Label className="text-sm font-medium text-gray-700">Preço</Label>
           <Input
             type="number"
+            step="0.01"
             {...register("price")}
             className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
           />
@@ -232,7 +235,7 @@ export function EditProductForm({
 
         <div className="flex flex-col gap-2">
           <Label className="text-sm font-medium text-gray-700">Tamanhos</Label>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4">
             {sizes.map((size) => (
               <label key={size.id} className="flex items-center space-x-2">
                 <input
@@ -262,7 +265,7 @@ export function EditProductForm({
           )}
         </div>
 
-        <div className="flex flex-row gap-8 items-center md:col-span-2">
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 items-start sm:items-center md:col-span-2">
           <div className="flex items-center gap-2">
             <Switch
               id="isActive"
@@ -289,7 +292,7 @@ export function EditProductForm({
               Disponível Imediatamente
             </Label>
           </div>
-          
+
           <div className="flex items-center gap-2">
             <Switch
               id="isFeatured"
@@ -301,25 +304,22 @@ export function EditProductForm({
               className="text-sm font-normal text-gray-700"
             >
               Destaque
-              <span className="text-xs text-gray-500">
-                ?
-              </span>
             </Label>
           </div>
         </div>
       </div>
 
-      <div className="flex justify-end gap-4 mt-4">
+      <div className="flex flex-col sm:flex-row justify-end gap-4 mt-4">
         <Link
           href="/admin/produtos"
-          className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+          className="w-full sm:w-auto px-4 py-2 text-center text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
         >
           Cancelar
         </Link>
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors"
+          className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors"
         >
           {isSubmitting ? "Salvando..." : "Salvar Alterações"}
         </Button>

@@ -13,7 +13,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" suppressHydrationWarning>
-      <body>
+      <body className="bg-gray-50">
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
@@ -22,7 +22,7 @@ export default function RootLayout({
         >
           <AuthProvider>
             <NavbarCliente />
-            {children}
+            <main className="flex min-h-screen mx-auto w-full">{children}</main>
             <FooterCliente />
           </AuthProvider>
         </ThemeProvider>

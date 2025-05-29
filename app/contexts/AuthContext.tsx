@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
 interface Admin {
   id: string;
@@ -25,22 +26,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem("admin_token");
-    if (token) {
+    console.log("useEffect chamado");
+    const fetchAdmin = async () => {
       try {
-        const payload = JSON.parse(atob(token.split(".")[1]));
-        setAdmin({
-          id: payload.id,
-          email: payload.email,
-          name: payload.name,
-          role: payload.role,
-        });
+        const response = await axios.get("/api/admin/profile");
+        setAdmin(response.data);
       } catch (error) {
-        console.error("Erro ao decodificar token:", error);
-        localStorage.removeItem("admin_token");
+        console.error("Erro ao buscar admin:", error);
+        setAdmin(null);
+      } finally {
+        setIsLoading(false);
       }
-    }
-    setIsLoading(false);
+    };
+
+    fetchAdmin();
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -56,12 +55,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       const data = await response.json();
-
-      localStorage.setItem("admin_token", data.token);
-
-      // Atualizar o estado do admin
       setAdmin(data.admin);
-
       router.push("/admin/dashboard");
     } catch (error) {
       console.error("Erro no login:", error);
@@ -69,10 +63,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem("admin_token");
-    setAdmin(null);
-    router.push("/admin/login");
+  const logout = async () => {
+    try {
+      await fetch("/api/admin/logout", { method: "POST" });
+    } catch (error) {
+      console.error("Erro ao fazer logout:", error);
+    } finally {
+      setAdmin(null);
+      router.push("/admin/login");
+    }
   };
 
   return (

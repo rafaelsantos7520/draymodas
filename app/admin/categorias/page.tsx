@@ -102,63 +102,114 @@ export default function Categorias() {
   };
 
   return (
-    <div className="container px-2 md:px-6">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-3xl font-bold tracking-tighter text-primary">
-          Categorias
-        </h1>
-        <Button
-          variant="outline"
-          className="rounded-xl"
-          onClick={() => {
-            setSelectedCategory(null);
-            setIsModalOpen(true);
-          }}
-        >
-          <Plus className="w-4 h-4" />
-          Criar Categoria
-        </Button>
-      </div>
+    <div className="container mx-auto px-2 py-6">
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
+            Categorias
+          </h1>
+          <Button
+            variant="default"
+            className="text-white rounded-xl w-full sm:w-auto bg-emerald-600 hover:bg-emerald-600/90"
+            onClick={() => {
+              setSelectedCategory(null);
+              setIsModalOpen(true);
+            }}
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Criar Categoria
+          </Button>
+        </div>
 
-      <Table className="border border-gray-200 rounded-xl">
-        <TableHeader className="bg-gray-100">
-          <TableRow>
-            <TableHead>Nome</TableHead>
-            <TableHead>Produtos</TableHead>
-            <TableHead>Ações</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
+        {/* Cards View - Mobile */}
+        <div className="grid grid-cols-1 sm:hidden gap-4">
           {categories.map((category) => (
-            <TableRow key={category.id}>
-              <TableCell>{category.name}</TableCell>
-              <TableCell>{category.productsCount}</TableCell>
-              <TableCell className="flex gap-2">
-                <Button
-                  variant="default"
-                  className="rounded-xl"
-                  onClick={() => {
-                    setSelectedCategory(category);
-                    setIsModalOpen(true);
-                  }}
-                >
-                  <Pencil className="w-4 h-4" />
-                  Editar
-                </Button>
-                <Button
-                  variant="destructive"
-                  className="rounded-xl"
-                  onClick={() => handleDeleteCategory(category.id)}
-                  disabled={category.productsCount > 0}
-                >
-                  <Trash className="w-4 h-4" />
-                  Excluir
-                </Button>
-              </TableCell>
-            </TableRow>
+            <div
+              key={category.id}
+              className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:shadow-md transition-shadow"
+            >
+              <div className="flex flex-col gap-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    {category.name}
+                  </h3>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {category.productsCount} produtos
+                  </p>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <Button
+                    variant="default"
+                    className="rounded-xl w-full"
+                    onClick={() => {
+                      setSelectedCategory(category);
+                      setIsModalOpen(true);
+                    }}
+                  >
+                    <Pencil className="w-4 h-4 mr-2" />
+                    Editar
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    className="rounded-xl w-full"
+                    onClick={() => handleDeleteCategory(category.id)}
+                    disabled={category.productsCount > 0}
+                  >
+                    <Trash className="w-4 h-4 mr-2" />
+                    Excluir
+                  </Button>
+                </div>
+              </div>
+            </div>
           ))}
-        </TableBody>
-      </Table>
+        </div>
+
+        {/* Table View - Desktop */}
+        <div className="hidden sm:block">
+          <Table className="border border-gray-200 rounded-xl">
+            <TableHeader className="bg-gray-100">
+              <TableRow>
+                <TableHead className="w-[40%]">Nome</TableHead>
+                <TableHead className="w-[30%]">Produtos</TableHead>
+                <TableHead className="w-[30%]">Ações</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {categories.map((category) => (
+                <TableRow key={category.id}>
+                  <TableCell className="font-medium">{category.name}</TableCell>
+                  <TableCell>{category.productsCount}</TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="default"
+                        className="rounded-xl"
+                        onClick={() => {
+                          setSelectedCategory(category);
+                          setIsModalOpen(true);
+                        }}
+                      >
+                        <Pencil className="w-4 h-4 mr-2" />
+                        Editar
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        className="rounded-xl"
+                        onClick={() => handleDeleteCategory(category.id)}
+                        disabled={category.productsCount > 0}
+                      >
+                        <Trash className="w-4 h-4 mr-2" />
+                        Excluir
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
 
       <CategoryModal
         isOpen={isModalOpen}

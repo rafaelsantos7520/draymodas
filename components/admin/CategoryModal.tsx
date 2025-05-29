@@ -109,7 +109,7 @@ export function CategoryModal({
             >
               Cancelar
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button className="bg-emerald-600 hover:bg-emerald-600/90" type="submit" disabled={isSubmitting}>
               {isSubmitting ? "Salvando..." : "Salvar"}
             </Button>
           </div>

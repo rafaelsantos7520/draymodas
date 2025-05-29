@@ -6,10 +6,14 @@ export default async function Page() {
   const sizes = await prisma.size.findMany();
 
   return (
-    <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-bold">Criar Produto</h1>
-      <div className="flex flex-col gap-4">
-        <NewProductForm categories={categories} sizes={sizes} />
+    <div className="container mx-auto px-2 py-6">
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">
+          Criar Produto
+        </h1>
+        <div className="flex w-full md:max-w-2xl justify-center">
+          <NewProductForm categories={categories} sizes={sizes} />
+        </div>
       </div>
     </div>
   );

@@ -36,9 +36,8 @@ export default async function Page(props: { params: Params }) {
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-bold">Editar Produto</h1>
-      <div className="flex flex-col gap-4">
+      <div className="container mx-auto px-2 py-6">
+        <div className="flex flex-col gap-4">
         <EditProductForm
           product={product as ProductWithRelations}
           categories={categories}

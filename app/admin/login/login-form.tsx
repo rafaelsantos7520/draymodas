@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { useAuth } from "@/app/contexts/AuthContext";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const formSchema = z.object({
   email: z.string().email("Email inválido"),
@@ -47,9 +48,14 @@ export function LoginForm() {
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
+    <Card className="w-full md:max-w-md">
+      <CardHeader>
+        <CardTitle>Login</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
           control={form.control}
           name="email"
           render={({ field }) => (
@@ -90,5 +96,7 @@ export function LoginForm() {
         </Button>
       </form>
     </Form>
+    </CardContent>
+    </Card>
   );
 }

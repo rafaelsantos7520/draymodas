@@ -34,7 +34,7 @@ export function AboutSection() {
             <Image
               src="/placeholder.svg?height=400&width=500"
               alt="Equipe Dray Modas"
-              width={500}
+              width={300}
               height={400}
               className="rounded-2xl shadow-2xl"
               loading="lazy"

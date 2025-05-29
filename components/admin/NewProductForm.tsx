@@ -17,7 +17,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useRouter } from "next/navigation";
-
+import { Textarea } from "@/components/ui/textarea";
 const productSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
   description: z.string().min(1, "Descrição é obrigatória"),
@@ -94,7 +94,7 @@ export function NewProductForm({
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col gap-4 max-w-2xl border p-4 rounded-lg"
+      className="flex flex-col gap-4 w-full md:max-w-2xl  rounded-lg"
     >
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-2">
@@ -106,7 +106,7 @@ export function NewProductForm({
         </div>
         <div className="flex flex-col gap-2">
           <Label>Descrição</Label>
-          <Input {...register("description")} />
+          <Textarea {...register("description")} />
           {errors.description && (
             <span className="text-red-500 text-sm">
               {errors.description.message}
@@ -204,7 +204,7 @@ export function NewProductForm({
           )}
         </div>
       </div>
-      <Button type="submit">Criar Produto</Button>
+      <Button className="w-full bg-emerald-600 hover:bg-emerald-600/90" type="submit">Criar Produto</Button>
     </form>
   );
 }

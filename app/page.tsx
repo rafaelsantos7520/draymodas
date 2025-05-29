@@ -11,13 +11,10 @@ export default async function Home() {
   const produtos = await getProductFeatured();
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <main className="flex-1">
-        <HeroSection />
-        {/* <FeaturedProducts products={produtos} /> */}
-        <AboutSection />
-        <TestimonialsSection />
-      </main>
+    <div className="flex flex-col mx-auto w-full">
+      <HeroSection />
+      {/* <AboutSection /> */}
+      <TestimonialsSection />
       <FeaturedProducts products={produtos as ProductWithRelations[]} />
     </div>
   );

@@ -254,7 +254,7 @@ export default function CatalogoPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col mx-auto w-full">
       <main className="flex-1">
         <section className="w-full py-4 md:py-12">
           <div className="container px-2 md:px-6">
