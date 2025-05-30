@@ -5,6 +5,8 @@ import { AuthProvider } from "./contexts/AuthContext";
 import NavbarCliente from "@/components/cliente/NavbarCliente";
 import FooterCliente from "@/components/cliente/FooterCliente";
 import { ThemeProvider } from "next-themes";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function RootLayout({
   children,
@@ -20,6 +22,8 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+        <ToastContainer />
+
           <AuthProvider>
             <NavbarCliente />
             <main className="flex min-h-screen mx-auto w-full">{children}</main>

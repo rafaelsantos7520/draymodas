@@ -8,8 +8,6 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    console.log(`🔵 Buscando produto no banco de dados: ID ${params.id}`);
-
     const product = await prisma.product.findUnique({
       where: { id: params.id },
       include: {
@@ -20,11 +18,8 @@ export async function GET(
     });
 
     if (!product) {
-      console.log(`⚠️ Produto não encontrado: ID ${params.id}`);
       return new NextResponse("Produto não encontrado", { status: 404 });
     }
-
-    console.log(`🟢 Produto encontrado: ${product.name}`);
 
     const relatedProducts = await prisma.product.findMany({
       where: {
@@ -34,10 +29,6 @@ export async function GET(
       include: { images: true },
       take: 3,
     });
-
-    console.log(
-      `🟣 Produtos relacionados encontrados: ${relatedProducts.length}`
-    );
 
     return NextResponse.json({ product, relatedProducts });
   } catch (error) {

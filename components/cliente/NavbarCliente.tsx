@@ -1,13 +1,21 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { useState } from "react"
-import { useAuth } from "@/app/contexts/AuthContext"
-import { Menu, Home, ShoppingBag, Info, Mail, LogOut, User } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { usePathname } from "next/navigation"
-import { cn } from "@/lib/utils"
+import Link from "next/link";
+import { useState } from "react";
+import { useAuth } from "@/app/contexts/AuthContext";
+import {
+  Menu,
+  Home,
+  ShoppingBag,
+  Info,
+  Mail,
+  LogOut,
+  User,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 const navItems = [
   {
@@ -30,7 +38,7 @@ const navItems = [
     href: "/contato",
     icon: Mail,
   },
-]
+];
 
 const adminItems = [
   {
@@ -48,21 +56,17 @@ const adminItems = [
     href: "/admin/categorias",
     icon: ShoppingBag,
   },
-  {
-    label: "Logout",
-    href: "/admin/logout",
-    icon: LogOut,
-  },
-]
+];
 
 export default function NavbarCliente() {
-  const [isOpen, setIsOpen] = useState(false)
-  const { admin } = useAuth()
-  const pathname = usePathname()
+  const [isOpen, setIsOpen] = useState(false);
+  const { admin, logout } = useAuth();
+  const pathname = usePathname();
 
-  const isActive = (href: string) => pathname === href
-  const isAdmin = admin !== null
-  const items = isAdmin ? adminItems : navItems
+  const isActive = (href: string) => pathname === href;
+  const isAdmin = admin !== null;
+  const items = isAdmin ? adminItems : navItems;
+  console.log(isAdmin);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -70,7 +74,9 @@ export default function NavbarCliente() {
         {/* Desktop Logo */}
         <div className="mr-4 hidden md:flex">
           <Link href="/" className="mr-6 flex items-center space-x-2">
-            <span className="hidden font-bold sm:inline-block text-xl">Dray Modas</span>
+            <span className="hidden font-bold sm:inline-block text-xl">
+              Dray Modas
+            </span>
           </Link>
         </div>
 
@@ -92,14 +98,18 @@ export default function NavbarCliente() {
             </SheetTrigger>
             <SheetContent side="right" className="pr-0">
               <div className="px-7">
-                <Link href="/" className="flex items-center" onClick={() => setIsOpen(false)}>
+                <Link
+                  href="/"
+                  className="flex items-center"
+                  onClick={() => setIsOpen(false)}
+                >
                   <span className="font-bold text-xl">Dray Modas</span>
                 </Link>
               </div>
               <div className="my-4 h-[calc(100vh-8rem)] pb-10 pl-6">
                 <div className="flex flex-col space-y-3">
                   {items.map((item) => {
-                    const Icon = item.icon
+                    const Icon = item.icon;
                     return (
                       <Link
                         key={item.href}
@@ -107,14 +117,29 @@ export default function NavbarCliente() {
                         onClick={() => setIsOpen(false)}
                         className={cn(
                           "flex items-center space-x-2 text-sm font-medium transition-colors hover:text-emerald-400",
-                          isActive(item.href) ? "text-primary" : "text-muted-foreground",
+                          isActive(item.href)
+                            ? "text-primary"
+                            : "text-muted-foreground"
                         )}
                       >
                         <Icon className="h-4 w-4" />
                         <span>{item.label}</span>
                       </Link>
-                    )
+                    );
                   })}
+                  {isAdmin && (
+                    <Button
+                      onClick={() => {
+                        logout();
+                        setIsOpen(false);
+                      }}
+                      className="w-full justify-start"
+                      variant="ghost"
+                    >
+                      <LogOut className="h-4 w-4 mr-2" />
+                      <span>Sair</span>
+                    </Button>
+                  )}
                 </div>
               </div>
             </SheetContent>
@@ -125,20 +150,22 @@ export default function NavbarCliente() {
         <div className="hidden md:flex flex-1 items-center justify-end">
           <nav className="flex items-center space-x-6 text-sm font-medium">
             {items.map((item) => {
-              const Icon = item.icon
+              const Icon = item.icon;
               return (
                 <Link
                   key={item.href}
                   href={item.href}
                   className={cn(
                     "flex items-center space-x-2 transition-colors hover:text-emerald-400",
-                    isActive(item.href) ? "text-emerald-400 font-semibold" : "text-muted-foreground",
+                    isActive(item.href)
+                      ? "text-emerald-400 font-semibold"
+                      : "text-muted-foreground"
                   )}
                 >
                   <Icon className="h-4 w-4" />
                   <span>{item.label}</span>
                 </Link>
-              )
+              );
             })}
           </nav>
 
@@ -149,8 +176,19 @@ export default function NavbarCliente() {
               <span>Admin</span>
             </div>
           )}
+          {/* Logout Button */}
+          {isAdmin && (
+            <Button
+              onClick={logout}
+              variant="ghost"
+              className="ml-4 flex items-center space-x-2"
+            >
+              <LogOut className="h-4 w-4" />
+              <span>Sair</span>
+            </Button>
+          )}
         </div>
       </div>
     </header>
-  )
+  );
 }

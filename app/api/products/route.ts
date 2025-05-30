@@ -7,8 +7,12 @@ export async function GET(request: Request) {
   const minPrice = searchParams.get("minPrice");
   const maxPrice = searchParams.get("maxPrice");
   const search = searchParams.get("search");
-  const sizeIds = searchParams.getAll("sizeId");
+  const sizeIds = searchParams.getAll("sizeId"); // pode ser múltiplo
+  const sort = searchParams.get("sort"); // "menor-preco" | "maior-preco" | null
+  const page = parseInt(searchParams.get("page") || "1", 10);
+  const limit = parseInt(searchParams.get("limit") || "20", 10);
 
+  // Monta o filtro principal
   const where: any = {};
   if (categoryId) where.categoryId = categoryId;
   if (minPrice)
@@ -17,41 +21,40 @@ export async function GET(request: Request) {
     where.price = { ...(where.price || {}), lte: parseFloat(maxPrice) };
   if (search) where.name = { contains: search, mode: "insensitive" };
 
-  // Filtro por tamanho
-  let products;
+  // Filtro por tamanho (sizeId)
   if (sizeIds && sizeIds.length > 0) {
-    products = await prisma.product.findMany({
-      where: {
-        ...where,
-        sizes: {
-          some: {
-            sizeId: { in: sizeIds },
-          },
-        },
+    where.sizes = {
+      some: {
+        sizeId: { in: sizeIds },
       },
-      include: {
-        category: true,
-        images: true,
-        sizes: {
-          include: {
-            size: true,
-          },
-        },
-      },
-    });
-  } else {
-    products = await prisma.product.findMany({
-      where,
-      include: {
-        category: true,
-        images: true,
-        sizes: {
-          include: {
-            size: true,
-          },
-        },
-      },
-    });
+    };
   }
+
+  // Ordenação
+  let orderBy: any = { createdAt: "desc" };
+  if (sort === "menor-preco") orderBy = { price: "asc" };
+  if (sort === "maior-preco") orderBy = { price: "desc" };
+
+  // Paginação
+  const skip = (page - 1) * limit;
+
+  // Busca produtos
+  const products = await prisma.product.findMany({
+    where,
+    orderBy,
+    skip,
+    take: limit,
+    include: {
+      category: true,
+      images: true,
+      sizes: {
+        include: {
+          size: true,
+        },
+      },
+    },
+  });
+
+  // Retorno enxuto para catálogo
   return NextResponse.json(products);
 }

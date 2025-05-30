@@ -20,7 +20,7 @@ export function ProductDetails({
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tighter text-[#3a5a40]">
+        <h1 className="text-3xl font-bold tracking-tighter  ">
           {name}
         </h1>
         <p className="text-muted-foreground uppercase tracking-wide font-semibold">
@@ -33,7 +33,7 @@ export function ProductDetails({
       </div>
       <div className="space-y-2">
         <h2 className="text-xl font-semibold">Preço</h2>
-        <p className="text-2xl font-bold text-[#3a5a40]">
+        <p className="text-2xl font-bold text-primary">
           R$ {price?.toFixed(2).replace(".", ",")}
         </p>
       </div>
@@ -44,7 +44,7 @@ export function ProductDetails({
             {sizes.map((item) => (
               <span
                 key={item.sizeId}
-                className="px-3 py-1 rounded border border-[#3a5a40] text-[#3a5a40] font-medium bg-white shadow-sm"
+                className="px-3 py-1 rounded border border-primary text-primary font-medium bg-white shadow-sm"
               >
                 {item.size?.name}
               </span>
@@ -59,7 +59,7 @@ export function ProductDetails({
           rel="noopener noreferrer"
           className="w-full"
         >
-          <Button className="w-full bg-green-600 hover:bg-green-700 text-white py-6 text-lg">
+          <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-6 text-lg">
             Quero este produto
           </Button>
         </a>

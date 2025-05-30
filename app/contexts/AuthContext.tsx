@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import axios from "axios";
 
 interface Admin {
@@ -24,9 +24,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [admin, setAdmin] = useState<Admin | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
-    console.log("useEffect chamado");
+    if (pathname === "/admin/login") {
+      setIsLoading(false);
+      return;
+    }
     const fetchAdmin = async () => {
       try {
         const response = await axios.get("/api/admin/profile");
@@ -38,9 +42,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsLoading(false);
       }
     };
-
     fetchAdmin();
-  }, []);
+  }, [pathname]);
 
   const login = async (email: string, password: string) => {
     try {
@@ -51,14 +54,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (!response.ok) {
-        throw new Error("Credenciais inválidas");
+        if (response.status === 401) {
+          throw new Error("Credenciais inválidas");
+        }
+        throw new Error("Erro ao fazer login");
       }
 
       const data = await response.json();
       setAdmin(data.admin);
       router.push("/admin/dashboard");
     } catch (error) {
-      console.error("Erro no login:", error);
       throw error;
     }
   };
