@@ -55,9 +55,8 @@ export default function CatalogoPage() {
   const [sortBy, setSortBy] = useState("relevancia");
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
-
+  console.log("products", products);
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
-  const productsCache = useRef<Map<string, Product[]>>(new Map());
 
   const buildFilters = useCallback(() => {
     const filters: Record<string, string> = {
@@ -75,21 +74,9 @@ export default function CatalogoPage() {
     async (pageNum = 1, resetProducts = true) => {
       try {
         const filters = { ...buildFilters(), page: pageNum.toString() };
-        const cacheKey = JSON.stringify(filters);
-        if (productsCache.current.has(cacheKey)) {
-          const cachedProducts = productsCache.current.get(cacheKey)!;
-          if (resetProducts) {
-            setProducts(cachedProducts);
-          } else {
-            setProducts((prev) => [...prev, ...cachedProducts]);
-          }
-          setHasMore(cachedProducts.length === ITEMS_PER_PAGE);
-          return;
-        }
         const queryParams = new URLSearchParams(filters);
         const response = await axios.get(`/api/products?${queryParams}`);
-        const newProducts = response.data || [];
-        productsCache.current.set(cacheKey, newProducts);
+        const newProducts = response.data.data || [];
         if (resetProducts) {
           setProducts(newProducts);
         } else {

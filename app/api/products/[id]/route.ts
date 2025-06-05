@@ -15,6 +15,10 @@ export async function GET(
         images: true,
         sizes: { include: { size: true } },
       },
+      cacheStrategy: {
+        ttl: 1000 * 60 * 10,
+        swr: 1000 * 60 * 10,
+      },
     });
 
     if (!product) {
@@ -28,6 +32,10 @@ export async function GET(
       },
       include: { images: true },
       take: 3,
+      cacheStrategy: {
+        ttl: 1000 * 60 * 10,
+        swr: 1000 * 60 * 10,
+      },
     });
 
     return NextResponse.json({ product, relatedProducts });
