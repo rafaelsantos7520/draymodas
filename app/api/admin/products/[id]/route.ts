@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-type Params = { id: string };
+type Params = Promise<{ id: string }>;
 
 export async function PUT(request: Request, segementData: { params: Params }) {
   const params = await segementData.params;

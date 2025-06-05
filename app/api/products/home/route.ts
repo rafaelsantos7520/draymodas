@@ -1,25 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { headers } from "next/headers";
 
-// Cache em memória para produtos em destaque
-let cachedProducts: any = null;
-let lastFetch = 0;
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutos em milissegundos
+
 
 export async function GET() {
   try {
-    const headersList = headers();
-    const now = Date.now();
-
-    // Verifica se o cache ainda é válido
-    if (cachedProducts && now - lastFetch < CACHE_DURATION) {
-      return NextResponse.json(cachedProducts, {
-        headers: {
-          "Cache-Control": "public, s-maxage=300, stale-while-revalidate=59",
-        },
-      });
-    }
 
     // Busca produtos do banco de dados
     const products = await prisma.product.findMany({
@@ -44,24 +29,23 @@ export async function GET() {
       orderBy: {
         createdAt: "desc",
       },
+      cacheStrategy: {
+        // dez minutos
+        ttl: 1000 * 60 * 10,  
+        swr: 1000 * 60 * 10,  
+      },
     });
 
     // Formata os produtos para a resposta
-    const formattedProducts = products.map((product) => ({
+    const formattedProducts = products.map((product: any) => ({
       id: product.id,
       name: product.name,
       images: product.images,
       category: product.category,
     }));
 
-    // Atualiza o cache
-    cachedProducts = formattedProducts;
-    lastFetch = now;
-
     return NextResponse.json(formattedProducts, {
-      headers: {
-        "Cache-Control": "public, s-maxage=300, stale-while-revalidate=59",
-      },
+
     });
   } catch (error) {
     console.error("Erro ao buscar produtos em destaque:", error);

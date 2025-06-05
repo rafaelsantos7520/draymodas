@@ -18,6 +18,7 @@ import { z } from "zod";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from "react-toastify";
 const productSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
   description: z.string().min(1, "Descrição é obrigatória"),
@@ -39,6 +40,7 @@ export function NewProductForm({
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const { admin } = useAuth();
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     register,
@@ -54,6 +56,7 @@ export function NewProductForm({
   });
 
   const onSubmit = async (data: ProductFormData) => {
+    setIsLoading(true);
     try {
       if (!admin) {
         throw new Error("Admin não autenticado");
@@ -80,13 +83,15 @@ export function NewProductForm({
         const errorData = await response.json();
         throw new Error(errorData.error || "Erro ao criar produto");
       }
-
+      setIsLoading(false);
       const result = await response.json();
+      toast.success("Produto criado com sucesso");
       console.log("Produto criado com sucesso:", result);
 
       // Redireciona para a página de produtos após sucesso
-      router.push("/admin/produtos");
+      router.push(`/produto/${result.data.id}`);
     } catch (error) {
+      setIsLoading(false);
       console.error("Erro:", error);
     }
   };
@@ -204,7 +209,13 @@ export function NewProductForm({
           )}
         </div>
       </div>
-      <Button className="w-full bg-emerald-600 hover:bg-emerald-600/90" type="submit">Criar Produto</Button>
+      <Button
+        disabled={isLoading}
+           className="w-full bg-emerald-600 hover:bg-emerald-600/90"
+        type="submit"
+      >
+        {isLoading ? "Criando..." : "Criar Produto"}
+      </Button>
     </form>
   );
 }

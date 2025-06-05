@@ -39,22 +39,27 @@ export async function GET(request: Request) {
   const skip = (page - 1) * limit;
 
   // Busca produtos
-  const products = await prisma.product.findMany({
-    where,
-    orderBy,
-    skip,
-    take: limit,
-    include: {
-      category: true,
-      images: true,
-      sizes: {
-        include: {
-          size: true,
+  const products = await prisma.product
+    .findMany({
+      where,
+      orderBy,
+      skip,
+      take: limit,
+      include: {
+        category: true,
+        images: true,
+        sizes: {
+          include: {
+            size: true,
+          },
         },
       },
-    },
-  });
-
+      cacheStrategy: {
+        ttl: 1000 * 60 * 10,
+        swr: 1000 * 60 * 10,
+      },
+    })
+    .withAccelerateInfo();
   // Retorno enxuto para catálogo
   return NextResponse.json(products);
 }

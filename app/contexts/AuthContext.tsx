@@ -31,8 +31,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(false);
       return;
     }
+
+    if (!pathname.startsWith("/admin")) {
+      setIsLoading(false);
+      return;
+    }
+
     const fetchAdmin = async () => {
       try {
+        console.log("fetchAdmin");
         const response = await axios.get("/api/admin/profile");
         setAdmin(response.data);
       } catch (error) {

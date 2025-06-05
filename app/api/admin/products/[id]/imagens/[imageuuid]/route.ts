@@ -26,12 +26,10 @@ export async function DELETE(
     }
     const imageUrl = image.url;
     const imagePath = imageUrl.split("/products/").pop() || "";
-    console.log("Caminho da imagem:", imagePath);
 
     const { data, error } = await supabase.storage
       .from("products")
       .remove([imagePath]);
-    console.log(imageUrl);
 
     if (error) {
       console.error("Erro ao deletar imagem:", error);
