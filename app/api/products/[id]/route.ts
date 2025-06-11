@@ -38,7 +38,14 @@ export async function GET(
       },
     });
 
-    return NextResponse.json({ product, relatedProducts });
+    return NextResponse.json(
+      { product, relatedProducts },
+      {
+        headers: {
+          "Cache-Control": "public, max-age=3600, stale-while-revalidate=3600",
+        },
+      }
+    );
   } catch (error) {
     console.error("❌ Erro ao buscar produto:", error);
     return new NextResponse("Erro interno do servidor", { status: 500 });

@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { supabase } from "@/lib/supabase";
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 type Params = Promise<{ id: string; imageuuid: string }>;
@@ -41,6 +42,10 @@ export async function DELETE(
         id: imageUuid,
       },
     });
+
+    revalidatePath(`/admin/products/${params.id}`);
+    revalidatePath(`/catalogo`);
+    revalidatePath(`/produto/${params.id}`);
 
     return NextResponse.json(
       { message: "Imagem deletada com sucesso" },

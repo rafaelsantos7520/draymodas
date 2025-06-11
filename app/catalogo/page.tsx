@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback, memo } from "react";
 import { Search, X, SlidersHorizontal } from "lucide-react";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { LoadingComponent } from "@/components/LoadingComponent";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -25,6 +25,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useInView } from "react-intersection-observer";
 
 interface Product {
   id: string;
@@ -41,122 +43,45 @@ interface Category {
   name: string;
 }
 
-const ITEMS_PER_PAGE = 10;
+interface ProductResponse {
+  data: Product[];
+  meta: {
+    total: number;
+    currentPage: number;
+    perPage: number;
+    totalPages: number;
+    hasNextPage: boolean;
+  };
+}
 
-export default function CatalogoPage() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [priceRange, setPriceRange] = useState({ min: "", max: "" });
-  const [searchQuery, setSearchQuery] = useState("");
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const [sortBy, setSortBy] = useState("relevancia");
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [filtersOpen, setFiltersOpen] = useState(false);
-  console.log("products", products);
-  const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
-
-  const buildFilters = useCallback(() => {
-    const filters: Record<string, string> = {
-      limit: ITEMS_PER_PAGE.toString(),
-    };
-    if (selectedCategory) filters.categoryId = selectedCategory;
-    if (priceRange.min) filters.minPrice = priceRange.min;
-    if (priceRange.max) filters.maxPrice = priceRange.max;
-    if (searchQuery.trim()) filters.search = searchQuery.trim();
-    if (sortBy !== "relevancia") filters.sort = sortBy;
-    return filters;
-  }, [selectedCategory, priceRange, searchQuery, sortBy]);
-
-  const fetchProducts = useCallback(
-    async (pageNum = 1, resetProducts = true) => {
-      try {
-        const filters = { ...buildFilters(), page: pageNum.toString() };
-        const queryParams = new URLSearchParams(filters);
-        const response = await axios.get(`/api/products?${queryParams}`);
-        const newProducts = response.data.data || [];
-        if (resetProducts) {
-          setProducts(newProducts);
-        } else {
-          setProducts((prev) => [...prev, ...newProducts]);
-        }
-        setHasMore(newProducts.length === ITEMS_PER_PAGE);
-      } catch (error) {
-        console.error("Erro ao carregar produtos:", error);
-        if (resetProducts) setProducts([]);
-        setHasMore(false);
-      }
-    },
-    [buildFilters]
-  );
-
-  const fetchCategories = useCallback(async () => {
-    try {
-      const response = await axios.get("/api/admin/categories");
-      setCategories(response.data || []);
-    } catch (error) {
-      console.error("Erro ao carregar categorias:", error);
-    }
-  }, []);
-
-  const debouncedSearch = useCallback(() => {
-    if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
-    debounceTimeout.current = setTimeout(() => {
-      setPage(1);
-      fetchProducts(1, true);
-    }, 500);
-  }, [fetchProducts]);
-
-  const handleCategoryChange = useCallback((categoryId: string) => {
-    setSelectedCategory(categoryId);
-    setPage(1);
-    setFiltersOpen(false); // Fecha o drawer no mobile após selecionar
-  }, []);
-
-  const handlePriceChange = useCallback(
-    (type: "min" | "max", value: string) => {
-      setPriceRange((prev) => ({ ...prev, [type]: value }));
-    },
-    []
-  );
-
-  const applyPriceFilter = useCallback(() => {
-    setPage(1);
-    fetchProducts(1, true);
-    setFiltersOpen(false); // Fecha o drawer no mobile após aplicar
-  }, [fetchProducts]);
-
-  const clearFilters = useCallback(() => {
-    setSelectedCategory("");
-    setPriceRange({ min: "", max: "" });
-    setSearchQuery("");
-    setSortBy("relevancia");
-    setPage(1);
-    setFiltersOpen(false);
-  }, []);
-
-  const loadMore = useCallback(async () => {
-    if (isLoadingMore || !hasMore) return;
-    setIsLoadingMore(true);
-    const nextPage = page + 1;
-    await fetchProducts(nextPage, false);
-    setPage(nextPage);
-    setIsLoadingMore(false);
-  }, [page, hasMore, isLoadingMore, fetchProducts]);
-
-  const hasActiveFilters = selectedCategory || priceRange.min || priceRange.max;
-
-  // Componente dos filtros para reutilizar
-  const FiltersContent = () => (
+// Componente dos filtros para reutilizar
+const FiltersContent = memo(
+  ({
+    selectedCategory,
+    priceRange,
+    appliedPriceRange,
+    categories,
+    onCategoryChange,
+    onPriceChange,
+    onApplyPriceFilter,
+    onClearFilters,
+  }: {
+    selectedCategory: string;
+    priceRange: { min: string; max: string };
+    appliedPriceRange: { min: string; max: string };
+    categories: Category[];
+    onCategoryChange: (categoryId: string) => void;
+    onPriceChange: (type: "min" | "max", value: string) => void;
+    onApplyPriceFilter: () => void;
+    onClearFilters: () => void;
+  }) => (
     <div className="space-y-6">
       {/* Categorias */}
       <div className="space-y-3">
         <h3 className="font-semibold text-lg">Categorias</h3>
         <div className="space-y-2">
           <button
-            onClick={() => handleCategoryChange("")}
+            onClick={() => onCategoryChange("")}
             className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${
               !selectedCategory
                 ? "bg-emerald-100 text-emerald-700 font-medium border border-emerald-200"
@@ -168,7 +93,7 @@ export default function CatalogoPage() {
           {categories.map((category) => (
             <button
               key={category.id}
-              onClick={() => handleCategoryChange(category.id)}
+              onClick={() => onCategoryChange(category.id)}
               className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${
                 selectedCategory === category.id
                   ? "bg-emerald-100 text-emerald-700 font-medium border border-emerald-200"
@@ -190,17 +115,17 @@ export default function CatalogoPage() {
               type="number"
               placeholder="Mínimo"
               value={priceRange.min}
-              onChange={(e) => handlePriceChange("min", e.target.value)}
+              onChange={(e) => onPriceChange("min", e.target.value)}
             />
             <Input
               type="number"
               placeholder="Máximo"
               value={priceRange.max}
-              onChange={(e) => handlePriceChange("max", e.target.value)}
+              onChange={(e) => onPriceChange("max", e.target.value)}
             />
           </div>
           <Button
-            onClick={applyPriceFilter}
+            onClick={onApplyPriceFilter}
             className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
           >
             Aplicar Filtro
@@ -209,9 +134,9 @@ export default function CatalogoPage() {
       </div>
 
       {/* Limpar Filtros */}
-      {(selectedCategory || priceRange.min || priceRange.max) && (
+      {(selectedCategory || appliedPriceRange.min || appliedPriceRange.max) && (
         <Button
-          onClick={clearFilters}
+          onClick={onClearFilters}
           variant="outline"
           className="w-full border-red-200 text-red-600 hover:bg-red-50"
         >
@@ -220,38 +145,111 @@ export default function CatalogoPage() {
         </Button>
       )}
     </div>
-  );
+  )
+);
 
+FiltersContent.displayName = "FiltersContent";
+
+export default function CatalogoPage() {
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [priceRange, setPriceRange] = useState({ min: "", max: "" });
+  const [appliedPriceRange, setAppliedPriceRange] = useState({
+    min: "",
+    max: "",
+  });
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("relevancia");
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
+  const { ref: loadMoreRef, inView } = useInView();
+
+  const buildFilters = useCallback(() => {
+    const filters: Record<string, string> = {};
+    if (selectedCategory) filters.categoryId = selectedCategory;
+    if (appliedPriceRange.min) filters.minPrice = appliedPriceRange.min;
+    if (appliedPriceRange.max) filters.maxPrice = appliedPriceRange.max;
+    if (searchQuery.trim()) filters.search = searchQuery.trim();
+    if (sortBy !== "relevancia") filters.sort = sortBy;
+    return filters;
+  }, [selectedCategory, appliedPriceRange, searchQuery, sortBy]);
+
+  // Query para categorias
+  const { data: categories = [] } = useQuery<Category[]>({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const response = await axios.get("/api/admin/categories");
+      return response.data || [];
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutos
+  });
+
+  // Query infinita para produtos
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    isError,
+  } = useInfiniteQuery({
+    queryKey: ["products", buildFilters()],
+    queryFn: async ({ pageParam = 1 }) => {
+      const filters = { ...buildFilters(), page: pageParam.toString() };
+      const queryParams = new URLSearchParams(filters);
+      const response = await axios.get(`/api/products?${queryParams}`);
+      return response.data as ProductResponse;
+    },
+    getNextPageParam: (lastPage) => {
+      if (lastPage.meta.hasNextPage) {
+        return lastPage.meta.currentPage + 1;
+      }
+      return undefined;
+    },
+    initialPageParam: 1,
+    staleTime: 1000 * 60, // 1 minuto
+  });
+
+  // Carregar mais produtos quando o usuário chegar ao final da página
   useEffect(() => {
-    const initializeData = async () => {
-      setLoading(true);
-      await Promise.all([fetchCategories(), fetchProducts(1, true)]);
-      setLoading(false);
-    };
-    initializeData();
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  const debouncedSearch = useCallback(() => {
+    if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+    debounceTimeout.current = setTimeout(() => {
+      // A busca será refeita automaticamente pelo React Query
+    }, 500);
   }, []);
 
-  useEffect(() => {
-    debouncedSearch();
-    return () => {
-      if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
-    };
-  }, [searchQuery, debouncedSearch]);
+  const handleCategoryChange = useCallback((categoryId: string) => {
+    setSelectedCategory(categoryId);
+    setFiltersOpen(false);
+  }, []);
 
-  useEffect(() => {
-    setPage(1);
-    fetchProducts(1, true);
-  }, [selectedCategory, sortBy, priceRange.min, priceRange.max]);
+  const handlePriceChange = useCallback(
+    (type: "min" | "max", value: string) => {
+      setPriceRange((prev) => ({ ...prev, [type]: value }));
+    },
+    []
+  );
 
-  if (loading) {
-    return (
-      <div className="flex flex-col min-h-screen w-full">
-        <main className="flex-1 flex items-center justify-center">
-          <LoadingComponent size="lg" text="Carregando produtos..." />
-        </main>
-      </div>
-    );
-  }
+  const applyPriceFilter = useCallback(() => {
+    setAppliedPriceRange(priceRange);
+    setFiltersOpen(false);
+  }, [priceRange]);
+
+  const clearFilters = useCallback(() => {
+    setSelectedCategory("");
+    setPriceRange({ min: "", max: "" });
+    setAppliedPriceRange({ min: "", max: "" });
+    setSearchQuery("");
+    setSortBy("relevancia");
+    setFiltersOpen(false);
+  }, []);
+
+  const hasActiveFilters = selectedCategory || priceRange.min || priceRange.max;
 
   return (
     <div className="min-h-screen mx-auto border border-gray-200 w-full">
@@ -271,11 +269,17 @@ export default function CatalogoPage() {
         <div className="flex flex-col lg:flex-row gap-6 md:gap-8">
           {/* Sidebar Desktop */}
           <aside className="hidden lg:block lg:w-64 space-y-4">
-            {/* Search Desktop */}
-
-            {/* Other Filters */}
             <div className="bg-white p-6 rounded-lg shadow-sm sticky top-4">
-              <FiltersContent />
+              <FiltersContent
+                selectedCategory={selectedCategory}
+                priceRange={priceRange}
+                appliedPriceRange={appliedPriceRange}
+                categories={categories}
+                onCategoryChange={handleCategoryChange}
+                onPriceChange={handlePriceChange}
+                onApplyPriceFilter={applyPriceFilter}
+                onClearFilters={clearFilters}
+              />
             </div>
           </aside>
 
@@ -329,13 +333,26 @@ export default function CatalogoPage() {
                         <SheetTitle className="text-left">Filtros</SheetTitle>
                       </SheetHeader>
                       <div className="p-6 overflow-auto h-[calc(100vh-80px)]">
-                        <FiltersContent />
+                        <FiltersContent
+                          selectedCategory={selectedCategory}
+                          priceRange={priceRange}
+                          appliedPriceRange={appliedPriceRange}
+                          categories={categories}
+                          onCategoryChange={handleCategoryChange}
+                          onPriceChange={handlePriceChange}
+                          onApplyPriceFilter={applyPriceFilter}
+                          onClearFilters={clearFilters}
+                        />
                       </div>
                     </SheetContent>
                   </Sheet>
 
                   <div className="text-gray-600 text-sm">
-                    {products.length} produtos encontrados
+                    {data?.pages.reduce(
+                      (total, page) => total + (page.data?.length || 0),
+                      0
+                    )}{" "}
+                    produtos encontrados
                   </div>
                 </div>
 
@@ -353,67 +370,107 @@ export default function CatalogoPage() {
               </div>
             </div>
 
-            {/* Products Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
-              {products.map((product) => (
-                <Link key={product.id} href={`/produto/${product.id}`}>
-                  <Card className="group cursor-pointer border-0 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden h-full flex flex-col">
-                    <div className="relative flex-shrink-0">
-                      <Image
-                        src={
-                          product.images[0]?.url || "/productCardDefault.png"
-                        }
-                        alt={product.name}
-                        width={300}
-                        height={400}
-                        className="w-full h-48 sm:h-56 md:h-64 object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                      <div className="absolute top-2 left-2 flex flex-col gap-1">
-                        {product.isNew && (
-                          <Badge className="bg-emerald-500 text-white text-xs">
-                            Novo
-                          </Badge>
-                        )}
-                        {product.isSale && (
-                          <Badge className="bg-red-500 text-white text-xs">
-                            Promoção
-                          </Badge>
-                        )}
-                      </div>
+            {/* Loading state */}
+            {isLoading && (
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <div key={index} className="animate-pulse">
+                    <div className="bg-gray-200 h-64 rounded-lg mb-4"></div>
+                    <div className="space-y-3">
+                      <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                      <div className="h-4 bg-gray-200 rounded w-1/2"></div>
                     </div>
-                    <CardContent className="p-3 sm:p-4 flex-1 flex flex-col justify-between">
-                      <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 text-sm sm:text-base leading-tight">
-                        {product.name}
-                      </h3>
-                      <div className="flex items-center gap-2 mt-auto">
-                        <span className="text-base sm:text-lg font-bold text-emerald-600">
-                          R$ {product.price.toFixed(2).replace(".", ",")}
-                        </span>
-                        {product.originalPrice && (
-                          <span className="text-xs sm:text-sm text-gray-500 line-through">
-                            R${" "}
-                            {product.originalPrice.toFixed(2).replace(".", ",")}
-                          </span>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
-            </div>
+                  </div>
+                ))}
+              </div>
+            )}
 
-            {/* Load More */}
-            {hasMore && (
-              <div className="text-center mt-8 md:mt-12">
+            {/* Products Grid */}
+            {!isLoading && (
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
+                {data?.pages.map((page) =>
+                  page.data.map((product: Product) => (
+                    <Link key={product.id} href={`/produto/${product.id}`}>
+                      <Card className="group cursor-pointer border-0 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden h-full flex flex-col">
+                        <div className="relative flex-shrink-0">
+                          <Image
+                            src={
+                              product.images[0]?.url ||
+                              "/productCardDefault.png"
+                            }
+                            alt={product.name}
+                            width={300}
+                            height={400}
+                            className="w-full h-48 sm:h-56 md:h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                          <div className="absolute top-2 left-2 flex flex-col gap-1">
+                            {product.isNew && (
+                              <Badge className="bg-emerald-500 text-white text-xs">
+                                Novo
+                              </Badge>
+                            )}
+                            {product.isSale && (
+                              <Badge className="bg-red-500 text-white text-xs">
+                                Promoção
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                        <CardContent className="p-3 sm:p-4 flex-1 flex flex-col justify-between">
+                          <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 text-sm sm:text-base leading-tight">
+                            {product.name}
+                          </h3>
+                          <div className="flex items-center gap-2 mt-auto">
+                            <span className="text-base sm:text-lg font-bold text-emerald-600">
+                              R$ {product.price.toFixed(2).replace(".", ",")}
+                            </span>
+                            {product.originalPrice && (
+                              <span className="text-xs sm:text-sm text-gray-500 line-through">
+                                R${" "}
+                                {product.originalPrice
+                                  .toFixed(2)
+                                  .replace(".", ",")}
+                              </span>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  ))
+                )}
+              </div>
+            )}
+
+            {/* Loading more indicator */}
+            {isFetchingNextPage && (
+              <div className="flex justify-center items-center py-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
+              </div>
+            )}
+
+            {/* Load more trigger */}
+            <div ref={loadMoreRef} className="h-10" />
+
+            {/* Error state */}
+            {isError && (
+              <div className="text-center py-8">
+                <p className="text-red-500">
+                  Erro ao carregar produtos. Tente novamente.
+                </p>
                 <Button
-                  onClick={loadMore}
-                  disabled={isLoadingMore}
+                  onClick={() => fetchNextPage()}
+                  className="mt-4"
                   variant="outline"
-                  size="lg"
-                  className="px-6 md:px-8 bg-emerald-600 hover:bg-emerald-700 text-white"
                 >
-                  {isLoadingMore ? "Carregando..." : "Carregar Mais Produtos"}
+                  Tentar novamente
                 </Button>
+              </div>
+            )}
+
+            {/* Empty state */}
+            {!isLoading && data?.pages[0]?.data.length === 0 && (
+              <div className="text-center py-8">
+                <p className="text-gray-500">Nenhum produto encontrado.</p>
               </div>
             )}
           </main>

@@ -7,6 +7,10 @@ import FooterCliente from "@/components/cliente/FooterCliente";
 import { ThemeProvider } from "next-themes";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient()
+
 
 export default function RootLayout({
   children,
@@ -22,13 +26,14 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-        <ToastContainer />
-
+          <QueryClientProvider client={queryClient}>
           <AuthProvider>
+            <ToastContainer />
             <NavbarCliente />
             <main className="flex min-h-screen mx-auto w-full">{children}</main>
             <FooterCliente />
           </AuthProvider>
+          </QueryClientProvider>
         </ThemeProvider>
       </body>
     </html>

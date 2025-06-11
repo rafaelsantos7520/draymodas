@@ -37,16 +37,14 @@ export async function GET() {
     });
 
     // Formata os produtos para a resposta
-    const formattedProducts = products.map((product: any) => ({
-      id: product.id,
-      name: product.name,
-      images: product.images,
-      category: product.category,
-    }));
+    // const formattedProducts = products.map((product: any) => ({
+    //   id: product.id,
+    //   name: product.name,
+    //   images: product.images,
+    //   category: product.category,
+    // }));
 
-    return NextResponse.json(formattedProducts, {
-
-    });
+    return NextResponse.json(products);
   } catch (error) {
     console.error("Erro ao buscar produtos em destaque:", error);
     return NextResponse.json(
