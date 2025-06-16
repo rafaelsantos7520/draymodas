@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-
-    // Busca produtos do banco de dados
     const products = await prisma.product.findMany({
       where: {
         isActive: true,
@@ -29,20 +27,7 @@ export async function GET() {
       orderBy: {
         createdAt: "desc",
       },
-      cacheStrategy: {
-        // dez minutos
-        ttl: 1000 * 60 * 10,  
-        swr: 1000 * 60 * 10,  
-      },
     });
-
-    // Formata os produtos para a resposta
-    // const formattedProducts = products.map((product: any) => ({
-    //   id: product.id,
-    //   name: product.name,
-    //   images: product.images,
-    //   category: product.category,
-    // }));
 
     return NextResponse.json(products);
   } catch (error) {

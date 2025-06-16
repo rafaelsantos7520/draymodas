@@ -1,8 +1,32 @@
 import { prisma } from "@/lib/prisma";
 import { supabase } from "@/lib/supabase";
 import { NextResponse } from "next/server";
+import sharp from "sharp";
+import heicConvert from "heic-convert";
 
 type Params = Promise<{ id: string }>;
+
+// Função para converter HEIC para JPEG
+async function convertHeicToJpeg(file: File): Promise<Buffer> {
+  const bytes = await file.arrayBuffer();
+  const buffer = Buffer.from(bytes);
+
+  if (file.type === "image/heic" || file.name.toLowerCase().endsWith(".heic")) {
+    try {
+      const jpegBuffer = await heicConvert({
+        buffer: buffer,
+        format: "JPEG",
+        quality: 0.9,
+      });
+      return jpegBuffer;
+    } catch (error) {
+      console.error("Erro na conversão HEIC:", error);
+      throw new Error("Falha ao converter imagem HEIC");
+    }
+  }
+
+  return buffer;
+}
 
 export async function GET(request: Request, segementData: { params: Params }) {
   const params = await segementData.params;
@@ -52,20 +76,20 @@ export async function POST(request: Request, segementData: { params: Params }) {
       );
     }
 
+    // Converte HEIC para JPEG se necessário
+    const buffer = await convertHeicToJpeg(file);
+
     // Gera um nome único para o arquivo
-    const fileExt = file.name.split(".").pop();
+    const fileExt =
+      file.type === "image/heic" ? "jpg" : file.name.split(".").pop();
     const fileName = `${Math.random()}.${fileExt}`;
     const filePath = `${id}/${fileName}`;
-
-    // Converte o arquivo para ArrayBuffer
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
 
     // Faz upload para o Supabase
     const { data, error } = await supabase.storage
       .from("products")
       .upload(filePath, buffer, {
-        contentType: file.type,
+        contentType: file.type === "image/heic" ? "image/jpeg" : file.type,
       });
 
     if (error) {

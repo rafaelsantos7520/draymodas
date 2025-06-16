@@ -1,6 +1,8 @@
 import { NewProductForm } from "@/components/admin/NewProductForm";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export default async function Page() {
   const categories = await prisma.category.findMany();
   const sizes = await prisma.size.findMany();

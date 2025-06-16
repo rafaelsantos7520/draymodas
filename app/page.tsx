@@ -1,4 +1,4 @@
-export const revalidate = 86400; // 24 horas
+export const dynamic = "force-dynamic";
 
 import { HeroSection } from "../components/HeroSection";
 import { FeaturedProducts } from "../components/FeaturedProducts";

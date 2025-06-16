@@ -89,7 +89,7 @@ export function NewProductForm({
       console.log("Produto criado com sucesso:", result);
 
       // Redireciona para a página de produtos após sucesso
-      router.push(`/produto/${result.data.id}`);
+      router.push(`/admin/produtos/${result.data.id}/imagens`);
     } catch (error) {
       setIsLoading(false);
       console.error("Erro:", error);
@@ -120,7 +120,7 @@ export function NewProductForm({
         </div>
         <div className="flex flex-col gap-2">
           <Label>Preço</Label>
-          <Input type="number" {...register("price")} />
+          <Input step="0.01" type="number" {...register("price")} />
           {errors.price && (
             <span className="text-red-500 text-sm">{errors.price.message}</span>
           )}

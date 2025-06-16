@@ -1,40 +1,31 @@
-"use client";
-
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
-import { AuthProvider } from "./contexts/AuthContext";
+import { CoreProvider } from "@/components/Core-provider";
 import NavbarCliente from "@/components/cliente/NavbarCliente";
+import { AuthProvider } from "@/app/contexts/AuthContext";
 import FooterCliente from "@/components/cliente/FooterCliente";
-import { ThemeProvider } from "next-themes";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-const queryClient = new QueryClient()
+const inter = Inter({ subsets: ["latin"] });
 
+export const metadata: Metadata = {
+  title: "Dray Modas",
+  description: "Dray Modas - Moda Feminina",
+};
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="pt-BR" suppressHydrationWarning>
-      <body className="bg-gray-50">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <QueryClientProvider client={queryClient}>
-          <AuthProvider>
-            <ToastContainer />
-            <NavbarCliente />
-            <main className="flex min-h-screen mx-auto w-full">{children}</main>
-            <FooterCliente />
-          </AuthProvider>
-          </QueryClientProvider>
-        </ThemeProvider>
+      <body className={inter.className}>
+        <AuthProvider>
+          <NavbarCliente />
+          <CoreProvider>{children}</CoreProvider>
+        </AuthProvider>
+        <FooterCliente />
       </body>
     </html>
   );
