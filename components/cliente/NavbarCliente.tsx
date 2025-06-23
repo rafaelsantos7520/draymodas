@@ -1,14 +1,23 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { useState } from "react"
-import { useAuth } from "@/app/contexts/AuthContext"
-import { Menu, Home, ShoppingBag, Info, Mail, LogOut, User, X } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { usePathname } from "next/navigation"
-import { cn } from "@/lib/utils"
-import { Separator } from "@/components/ui/separator"
+import Link from "next/link";
+import { useState } from "react";
+import { useAuth } from "@/app/contexts/AuthContext";
+import {
+  Menu,
+  Home,
+  ShoppingBag,
+  Info,
+  Mail,
+  LogOut,
+  User,
+  X,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { Separator } from "@/components/ui/separator";
 
 const navItems = [
   {
@@ -31,7 +40,7 @@ const navItems = [
     href: "/contato",
     icon: Mail,
   },
-]
+];
 
 const adminItems = [
   {
@@ -49,16 +58,16 @@ const adminItems = [
     href: "/admin/categorias",
     icon: ShoppingBag,
   },
-]
+];
 
 export default function NavbarCliente() {
-  const [isOpen, setIsOpen] = useState(false)
-  const { admin, logout } = useAuth()
-  const pathname = usePathname()
+  const [isOpen, setIsOpen] = useState(false);
+  const { admin, logout } = useAuth();
+  const pathname = usePathname();
 
-  const isActive = (href: string) => pathname === href
-  const isAdmin = admin !== null
-  const items = isAdmin ? adminItems : navItems
+  const isActive = (href: string) => pathname === href;
+  const isAdmin = admin !== null;
+  const items = isAdmin ? adminItems : navItems;
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -66,7 +75,9 @@ export default function NavbarCliente() {
         {/* Desktop Logo */}
         <div className="mr-4 hidden md:flex">
           <Link href="/" className="mr-6 flex items-center space-x-2">
-            <span className="hidden font-bold sm:inline-block text-xl">Dray Modas</span>
+            <span className="hidden font-bold sm:inline-block text-xl">
+              Dray Modas
+            </span>
           </Link>
         </div>
 
@@ -90,22 +101,29 @@ export default function NavbarCliente() {
             <SheetContent side="right" className="w-80 p-0">
               {/* Header do Sidebar */}
               <div className="flex items-center justify-between p-6 border-b">
-                <Link href="/" className="flex items-center" onClick={() => setIsOpen(false)}>
+                <Link
+                  href="/"
+                  className="flex items-center"
+                  onClick={() => setIsOpen(false)}
+                >
                   <span className="font-bold text-xl">Dray Modas</span>
                 </Link>
-           
               </div>
 
               {/* Admin Badge */}
               {isAdmin && (
                 <div className="p-6 pb-4">
-                  <div className="flex items-center space-x-3 rounded-lg bg-emerald-50 dark:bg-emerald-950 px-4 py-3 border border-emerald-200 dark:border-emerald-800">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900">
-                      <User className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                  <div className="flex items-center space-x-3 rounded-lg bg-pink-50 dark:bg-pink-950 px-4 py-3 border border-pink-200 dark:border-pink-800">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-pink-100 dark:bg-pink-900">
+                      <User className="h-4 w-4 text-pink-600 dark:text-pink-400" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-emerald-900 dark:text-emerald-100">Modo Administrador</p>
-                      <p className="text-xs text-emerald-600 dark:text-emerald-400">Acesso completo ao sistema</p>
+                      <p className="text-sm font-medium text-pink-900 dark:text-pink-100">
+                        Modo Administrador
+                      </p>
+                      <p className="text-xs text-pink-600 dark:text-pink-400">
+                        Acesso completo ao sistema
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -115,8 +133,8 @@ export default function NavbarCliente() {
               <div className="flex-1 overflow-auto px-6">
                 <nav className="space-y-2">
                   {items.map((item) => {
-                    const Icon = item.icon
-                    const active = isActive(item.href)
+                    const Icon = item.icon;
+                    const active = isActive(item.href);
                     return (
                       <Link
                         key={item.href}
@@ -125,19 +143,19 @@ export default function NavbarCliente() {
                         className={cn(
                           "flex items-center space-x-4 rounded-lg px-4 py-3 text-base font-medium transition-all duration-200 hover:bg-accent hover:text-accent-foreground",
                           active
-                            ? "bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"
-                            : "text-muted-foreground hover:text-foreground",
+                            ? "bg-pink-50 dark:bg-pink-950 text-pink-700 dark:text-pink-300 border border-pink-200 dark:border-pink-800"
+                            : "text-muted-foreground hover:text-foreground"
                         )}
                       >
                         <Icon
                           className={cn(
                             "h-5 w-5 flex-shrink-0",
-                            active ? "text-emerald-600 dark:text-emerald-400" : "",
+                            active ? "text-pink-600 dark:text-pink-400" : ""
                           )}
                         />
                         <span className="flex-1">{item.label}</span>
                       </Link>
-                    )
+                    );
                   })}
                 </nav>
               </div>
@@ -149,8 +167,8 @@ export default function NavbarCliente() {
                   <div className="p-6">
                     <Button
                       onClick={() => {
-                        logout()
-                        setIsOpen(false)
+                        logout();
+                        setIsOpen(false);
                       }}
                       variant="outline"
                       className="w-full justify-start text-base font-medium h-12 border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950"
@@ -169,26 +187,28 @@ export default function NavbarCliente() {
         <div className="hidden md:flex flex-1 items-center justify-end">
           <nav className="flex items-center space-x-6 text-sm font-medium">
             {items.map((item) => {
-              const Icon = item.icon
+              const Icon = item.icon;
               return (
                 <Link
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "flex items-center space-x-2 transition-colors hover:text-emerald-400",
-                    isActive(item.href) ? "text-emerald-400 font-semibold" : "text-muted-foreground",
+                    "flex items-center space-x-2 transition-colors hover:text-pink-500",
+                    isActive(item.href)
+                      ? "text-pink-500 font-semibold"
+                      : "text-muted-foreground"
                   )}
                 >
                   <Icon className="h-4 w-4" />
                   <span>{item.label}</span>
                 </Link>
-              )
+              );
             })}
           </nav>
 
           {/* Admin Badge Desktop */}
           {isAdmin && (
-            <div className="ml-4 flex items-center space-x-2 rounded-full bg-emerald-50 dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800 px-3 py-1 text-xs font-medium text-emerald-700 dark:text-emerald-300">
+            <div className="ml-4 flex items-center space-x-2 rounded-full bg-pink-50 dark:bg-pink-950 border border-pink-200 dark:border-pink-800 px-3 py-1 text-xs font-medium text-pink-700 dark:text-pink-300">
               <User className="h-3 w-3" />
               <span>Admin</span>
             </div>
@@ -208,5 +228,5 @@ export default function NavbarCliente() {
         </div>
       </div>
     </header>
-  )
+  );
 }

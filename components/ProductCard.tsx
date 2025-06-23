@@ -18,32 +18,35 @@ export const ProductCard = memo(function ProductCard({
 
   return (
     <ProductLink href={`/produto/${product.id}`}>
-      <div className="group relative overflow-hidden rounded-lg border bg-white shadow-sm transition-all hover:shadow-md">
-        <div className="relative aspect-square overflow-hidden">
+      <div className="group relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-all hover:shadow-md hover:border-gray-300">
+        <div className="relative aspect-[3/4] overflow-hidden">
           <Image
             src={product.images[0]?.url || "/productCardDefault.png"}
             alt={product.name}
             fill
-            className={`object-cover transition-opacity duration-300 ${
+            className={`object-contain transition-opacity duration-300 ${
               imageLoaded ? "opacity-100" : "opacity-0"
             }`}
             onLoad={() => setImageLoaded(true)}
           />
           {!imageLoaded && (
-            <div className="absolute inset-0 bg-gray-200 animate-pulse" />
+            <div className="absolute inset-0 bg-gray-100 animate-pulse" />
           )}
         </div>
 
         <div className="p-4">
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-gray-900 line-clamp-1">
+            <h3 className="font-semibold text-gray-900 line-clamp-1 group-hover:text-pink-600 transition-colors">
               {product.name}
             </h3>
-            <ChevronRight className="h-5 w-5 text-gray-400 transition-transform group-hover:translate-x-1" />
+            <ChevronRight className="h-5 w-5 text-gray-400 transition-transform group-hover:translate-x-1 group-hover:text-pink-500" />
           </div>
 
           <div className="mt-2 flex items-center justify-between">
-            <Badge variant="secondary" className="text-xs">
+            <Badge
+              variant="secondary"
+              className="text-xs bg-gray-50 text-gray-700 border-gray-200"
+            >
               {product.category?.name || "Sem categoria"}
             </Badge>
             <div className="flex items-center">

@@ -20,31 +20,33 @@ export function ProductDetails({
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tighter  ">
+        <h1 className="text-3xl font-bold tracking-tighter text-gray-900">
           {name}
         </h1>
-        <p className="text-muted-foreground uppercase tracking-wide font-semibold">
+        <p className="text-pink-600 uppercase tracking-wide font-semibold">
           {category?.name}
         </p>
       </div>
       <div className="space-y-2">
-        <h2 className="text-xl font-semibold">Descrição</h2>
-        <p className="text-muted-foreground text-base">{description}</p>
+        <h2 className="text-xl font-semibold text-gray-900">Descrição</h2>
+        <p className="text-gray-600 text-base">{description}</p>
       </div>
       <div className="space-y-2">
-        <h2 className="text-xl font-semibold">Preço</h2>
-        <p className="text-2xl font-bold text-primary">
+        <h2 className="text-xl font-semibold text-gray-900">Preço</h2>
+        <p className="text-2xl font-bold text-pink-600">
           R$ {price?.toFixed(2).replace(".", ",")}
         </p>
       </div>
       {sizes && sizes.length > 0 && (
         <div className="space-y-2">
-          <h2 className="text-xl font-semibold">Tamanhos disponíveis</h2>
+          <h2 className="text-xl font-semibold text-gray-900">
+            Tamanhos disponíveis
+          </h2>
           <div className="flex gap-2 flex-wrap">
             {sizes.map((item) => (
               <span
                 key={item.sizeId}
-                className="px-3 py-1 rounded border border-primary text-primary font-medium bg-white shadow-sm"
+                className="px-3 py-1 rounded border border-pink-200 text-pink-700 font-medium bg-pink-50 shadow-sm"
               >
                 {item.size?.name}
               </span>
@@ -59,11 +61,11 @@ export function ProductDetails({
           rel="noopener noreferrer"
           className="w-full"
         >
-          <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-6 text-lg">
+          <Button className="w-full bg-pink-600 hover:bg-pink-700 text-white py-6 text-lg">
             Quero este produto
           </Button>
         </a>
-        <p className="text-sm text-muted-foreground italic mt-2">
+        <p className="text-sm text-gray-500 italic mt-2">
           * Este é apenas um catálogo para visualização. Para informações sobre
           preços e disponibilidade, entre em contato conosco.
         </p>
