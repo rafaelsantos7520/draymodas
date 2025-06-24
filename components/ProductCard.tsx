@@ -28,6 +28,10 @@ export const ProductCard = memo(function ProductCard({
               imageLoaded ? "opacity-100" : "opacity-0"
             }`}
             onLoad={() => setImageLoaded(true)}
+            priority={false}
+            loading="lazy"
+            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+            quality={75}
           />
           {!imageLoaded && (
             <div className="absolute inset-0 bg-gray-100 animate-pulse" />
@@ -36,10 +40,10 @@ export const ProductCard = memo(function ProductCard({
 
         <div className="p-4">
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-gray-900 line-clamp-1 group-hover:text-pink-600 transition-colors">
+            <h3 className="font-semibold text-gray-900 line-clamp-1 group-hover:text-brand-primary transition-colors">
               {product.name}
             </h3>
-            <ChevronRight className="h-5 w-5 text-gray-400 transition-transform group-hover:translate-x-1 group-hover:text-pink-500" />
+            <ChevronRight className="h-5 w-5 text-gray-400 transition-transform group-hover:translate-x-1 group-hover:text-brand-primary" />
           </div>
 
           <div className="mt-2 flex items-center justify-between">

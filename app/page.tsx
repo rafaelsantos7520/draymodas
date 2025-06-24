@@ -1,9 +1,4 @@
-export const dynamic = "force-dynamic";
-
-import { StoreBanner } from "../components/StoreBanner";
-import { PromotionalBanner } from "../components/PromotionalBanner";
-import { FeaturedProducts } from "../components/FeaturedProducts";
-import { CategoryGrid } from "../components/CategoryGrid";
+import { FeaturedProducts } from "@/components/FeaturedProducts";
 import { BestSellers } from "../components/BestSellers";
 import {
   getProductFeatured,
@@ -11,6 +6,10 @@ import {
 } from "@/lib/services/product.service";
 import { getCategories } from "@/lib/services/category.service";
 import { ProductWithRelations } from "@/types/product";
+import { HeroBanner } from "@/components/HeroBanner";
+
+// Cache por 5 minutos para melhorar performance
+export const revalidate = 300;
 
 export default async function Home() {
   const [featuredProducts, allProducts, categories] = await Promise.all([
@@ -21,9 +20,7 @@ export default async function Home() {
 
   return (
     <div className="flex flex-col mx-auto w-full">
-      <StoreBanner />
-      <PromotionalBanner />
-      <CategoryGrid categories={categories} />
+      <HeroBanner />
       <FeaturedProducts products={featuredProducts as ProductWithRelations[]} />
       <BestSellers products={allProducts as ProductWithRelations[]} />
     </div>

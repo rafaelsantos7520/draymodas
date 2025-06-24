@@ -115,13 +115,13 @@ export default function NavbarCliente() {
                 <div className="p-6 pb-4">
                   <div className="flex items-center space-x-3 rounded-lg bg-pink-50 dark:bg-pink-950 px-4 py-3 border border-pink-200 dark:border-pink-800">
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-pink-100 dark:bg-pink-900">
-                      <User className="h-4 w-4 text-pink-600 dark:text-pink-400" />
+                      <User className="h-4 w-4 text-brand-primary dark:text-pink-400" />
                     </div>
                     <div>
                       <p className="text-sm font-medium text-pink-900 dark:text-pink-100">
                         Modo Administrador
                       </p>
-                      <p className="text-xs text-pink-600 dark:text-pink-400">
+                      <p className="text-xs text-brand-primary dark:text-pink-400">
                         Acesso completo ao sistema
                       </p>
                     </div>
@@ -143,14 +143,16 @@ export default function NavbarCliente() {
                         className={cn(
                           "flex items-center space-x-4 rounded-lg px-4 py-3 text-base font-medium transition-all duration-200 hover:bg-accent hover:text-accent-foreground",
                           active
-                            ? "bg-pink-50 dark:bg-pink-950 text-pink-700 dark:text-pink-300 border border-pink-200 dark:border-pink-800"
+                            ? "bg-pink-50 dark:bg-pink-950 text-brand-primary dark:text-pink-300 border border-pink-200 dark:border-pink-800"
                             : "text-muted-foreground hover:text-foreground"
                         )}
                       >
                         <Icon
                           className={cn(
                             "h-5 w-5 flex-shrink-0",
-                            active ? "text-pink-600 dark:text-pink-400" : ""
+                            active
+                              ? "text-brand-primary dark:text-pink-400"
+                              : ""
                           )}
                         />
                         <span className="flex-1">{item.label}</span>
@@ -193,9 +195,9 @@ export default function NavbarCliente() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "flex items-center space-x-2 transition-colors hover:text-pink-500",
+                    "flex items-center space-x-2 transition-colors hover:text-brand-primary",
                     isActive(item.href)
-                      ? "text-pink-500 font-semibold"
+                      ? "text-brand-primary font-semibold"
                       : "text-muted-foreground"
                   )}
                 >
@@ -208,7 +210,7 @@ export default function NavbarCliente() {
 
           {/* Admin Badge Desktop */}
           {isAdmin && (
-            <div className="ml-4 flex items-center space-x-2 rounded-full bg-pink-50 dark:bg-pink-950 border border-pink-200 dark:border-pink-800 px-3 py-1 text-xs font-medium text-pink-700 dark:text-pink-300">
+            <div className="ml-4 flex items-center space-x-2 rounded-full bg-pink-50 dark:bg-pink-950 border border-pink-200 dark:border-pink-800 px-3 py-1 text-xs font-medium text-brand-primary dark:text-pink-300">
               <User className="h-3 w-3" />
               <span>Admin</span>
             </div>

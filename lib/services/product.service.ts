@@ -58,9 +58,26 @@ export async function getProductById(id: string) {
 
 export async function getProducts() {
   const products = await prisma.product.findMany({
+    where: {
+      isActive: true,
+    },
     include: {
-      category: true,
-      images: true,
+      category: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      images: {
+        take: 1,
+        select: {
+          url: true,
+        },
+      },
+    },
+    take: 8,
+    orderBy: {
+      createdAt: "desc",
     },
   });
 
@@ -71,10 +88,21 @@ export async function getProductsByCategory(categoryId: string) {
   const products = await prisma.product.findMany({
     where: {
       categoryId,
+      isActive: true,
     },
     include: {
-      category: true,
-      images: true,
+      category: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      images: {
+        take: 1,
+        select: {
+          url: true,
+        },
+      },
     },
   });
 
@@ -90,9 +118,15 @@ export async function getProductWithRelated(id: string) {
     where: {
       categoryId: product.categoryId,
       id: { not: product.id },
+      isActive: true,
     },
     include: {
-      images: true,
+      images: {
+        take: 1,
+        select: {
+          url: true,
+        },
+      },
     },
     take: 3,
   });
@@ -107,15 +141,25 @@ export async function getProductFeatured() {
   const products = await prisma.product.findMany({
     where: {
       isFeatured: true,
+      isActive: true,
     },
     include: {
-      category: true,
-      images: true,
-      sizes: {
-        include: {
-          size: true,
+      category: {
+        select: {
+          id: true,
+          name: true,
         },
       },
+      images: {
+        take: 1,
+        select: {
+          url: true,
+        },
+      },
+    },
+    take: 4,
+    orderBy: {
+      createdAt: "desc",
     },
   });
 

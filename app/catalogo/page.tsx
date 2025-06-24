@@ -2,7 +2,14 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState, useRef, useCallback, memo } from "react";
+import {
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+  memo,
+  Suspense,
+} from "react";
 import { Search, X, SlidersHorizontal } from "lucide-react";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -71,7 +78,7 @@ const CategoryChips = memo(
         onClick={() => onCategoryChange("")}
         className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
           !selectedCategory
-            ? "bg-pink-600 text-white"
+            ? "bg-brand-primary text-white"
             : "bg-gray-100 text-gray-700 hover:bg-gray-200"
         }`}
       >
@@ -83,7 +90,7 @@ const CategoryChips = memo(
           onClick={() => onCategoryChange(category.id)}
           className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
             selectedCategory === category.id
-              ? "bg-pink-600 text-white"
+              ? "bg-brand-primary text-white"
               : "bg-gray-100 text-gray-700 hover:bg-gray-200"
           }`}
         >
@@ -96,7 +103,7 @@ const CategoryChips = memo(
 
 CategoryChips.displayName = "CategoryChips";
 
-export default function CatalogoPage() {
+function CatalogoContent() {
   const searchParams = useSearchParams();
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -219,7 +226,7 @@ export default function CatalogoPage() {
                 onClick={() => handleCategoryChange("")}
                 className={`px-5 py-2.5 rounded-full text-sm font-medium transition-colors ${
                   !selectedCategory
-                    ? "bg-pink-600 text-white shadow-md"
+                    ? "bg-brand-primary text-white shadow-md"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
               >
@@ -231,7 +238,7 @@ export default function CatalogoPage() {
                   onClick={() => handleCategoryChange(category.id)}
                   className={`px-5 py-2.5 rounded-full text-sm font-medium transition-colors ${
                     selectedCategory === category.id
-                      ? "bg-pink-600 text-white shadow-md"
+                      ? "bg-brand-primary text-white shadow-md"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                   }`}
                 >
@@ -301,7 +308,7 @@ export default function CatalogoPage() {
                         />
                         <div className="absolute top-2 left-2 flex flex-col gap-1">
                           {product.isNew && (
-                            <Badge className="bg-pink-500/90 backdrop-blur-sm text-white text-xs border-0 shadow-lg">
+                            <Badge className="bg-brand-primary/90 backdrop-blur-sm text-white text-xs border-0 shadow-lg">
                               Novo
                             </Badge>
                           )}
@@ -317,7 +324,7 @@ export default function CatalogoPage() {
                           {product.name}
                         </h3>
                         <div className="flex items-center gap-2 mt-auto">
-                          <span className="text-base sm:text-lg font-bold text-pink-600">
+                          <span className="text-base sm:text-lg font-bold text-brand-primary">
                             R$ {product.price.toFixed(2).replace(".", ",")}
                           </span>
                           {product.originalPrice && (
@@ -340,7 +347,7 @@ export default function CatalogoPage() {
           {/* Loading more indicator */}
           {isFetchingNextPage && (
             <div className="flex justify-center items-center py-4">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary"></div>
             </div>
           )}
 
@@ -372,5 +379,13 @@ export default function CatalogoPage() {
         </main>
       </div>
     </div>
+  );
+}
+
+export default function CatalogoPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CatalogoContent />
+    </Suspense>
   );
 }

@@ -12,18 +12,21 @@ interface BestSellersProps {
 }
 
 export function BestSellers({ products }: BestSellersProps) {
+  // Limitar a 4 produtos para melhor performance
+  const displayProducts = products.slice(0, 4);
+
   return (
-    <section className="w-full py-12">
+    <section className="w-full py-8">
       <div className="container px-4 md:px-6">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <TrendingUp className="h-8 w-8 text-pink-500" />
+            <TrendingUp className="h-6 w-6 text-brand-primary" />
             <div>
-              <h2 className="text-3xl font-bold text-gray-900">
+              <h2 className="text-2xl font-bold text-gray-900">
                 Mais Vendidos
               </h2>
-              <p className="text-gray-600">
-                Os produtos mais populares da nossa loja
+              <p className="text-gray-600 text-sm">
+                Os produtos mais populares
               </p>
             </div>
           </div>
@@ -38,12 +41,12 @@ export function BestSellers({ products }: BestSellersProps) {
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-          {products.slice(0, 8).map((product, index) => (
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          {displayProducts.map((product, index) => (
             <div key={product.id} className="relative">
-              {index < 3 && (
+              {index < 2 && (
                 <div className="absolute top-2 left-2 z-10">
-                  <Badge className="bg-pink-500/90 backdrop-blur-sm text-white text-xs border-0 shadow-lg">
+                  <Badge className="bg-brand-primary/90 backdrop-blur-sm text-white text-xs border-0 shadow-lg">
                     #{index + 1} Mais Vendido
                   </Badge>
                 </div>
@@ -53,11 +56,11 @@ export function BestSellers({ products }: BestSellersProps) {
           ))}
         </div>
 
-        <div className="flex justify-center mt-8">
+        <div className="flex justify-center mt-6">
           <Link href="/catalogo">
             <Button
               size="lg"
-              className="bg-pink-600 hover:bg-pink-700 text-white"
+              className="bg-brand-primary hover:bg-brand-primary-dark text-white"
             >
               Ver Todos os Produtos
               <ChevronRight className="ml-2 h-5 w-5" />

@@ -1,16 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-
-interface Product {
-  id: string;
-  name: string;
-  price: number;
-  images: { url: string }[];
-}
+import { ProductWithRelations } from "@/types/product";
 
 interface RelatedProductsProps {
-  products: Product[];
+  products: ProductWithRelations[];
 }
 
 export function RelatedProducts({ products }: RelatedProductsProps) {
@@ -35,13 +29,13 @@ export function RelatedProducts({ products }: RelatedProductsProps) {
             <h3 className="font-semibold text-lg mb-2 text-gray-900">
               {product.name}
             </h3>
-            <p className="text-pink-600 font-bold mb-2">
+            <p className="text-brand-primary font-bold mb-2">
               R$ {product.price?.toFixed(2).replace(".", ",")}
             </p>
             <Link href={`/produto/${product.id}`}>
               <Button
                 variant="outline"
-                className="w-full border-pink-200 text-pink-600 hover:bg-pink-50"
+                className="w-full border-pink-200 text-brand-primary hover:bg-pink-50"
               >
                 Ver detalhes
               </Button>

@@ -35,7 +35,7 @@ export function CategoryGrid({ categories }: CategoryGridProps) {
                   <div className="w-8 h-8 md:w-14 md:h-14 bg-pink-50 rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3 group-hover:bg-pink-100 transition-colors">
                     <span className="text-sm md:text-xl">👗</span>
                   </div>
-                  <h3 className="font-medium text-gray-900 group-hover:text-pink-600 transition-colors text-xs md:text-base">
+                  <h3 className="font-medium text-gray-900 group-hover:text-brand-primary transition-colors text-xs md:text-base">
                     {category.name}
                   </h3>
                 </CardContent>

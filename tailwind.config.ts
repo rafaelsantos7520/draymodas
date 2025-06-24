@@ -2,7 +2,6 @@ import type { Config } from "tailwindcss";
 import tailwindcssAnimate from "tailwindcss-animate";
 
 const config: Config = {
-  darkMode: "class",
   content: [
     "./pages/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
@@ -52,6 +51,24 @@ const config: Config = {
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
+        },
+        brand: {
+          primary: "hsl(var(--brand-primary))",
+          "primary-light": "hsl(var(--brand-primary-light))",
+          "primary-dark": "hsl(var(--brand-primary-dark))",
+        },
+        green: {
+          50: "hsl(var(--green-50))",
+          100: "hsl(var(--green-100))",
+          200: "hsl(var(--green-200))",
+          300: "hsl(var(--green-300))",
+          400: "hsl(var(--green-400))",
+          500: "hsl(var(--green-500))",
+          600: "hsl(var(--green-600))",
+          700: "hsl(var(--green-700))",
+          800: "hsl(var(--green-800))",
+          900: "hsl(var(--green-900))",
+          950: "hsl(var(--green-950))",
         },
       },
       borderRadius: {
