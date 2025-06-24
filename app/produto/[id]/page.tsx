@@ -12,7 +12,6 @@ import { ProductWithRelations } from "@/types/product";
 import Loading from "./loading";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 
 interface ProductResponse {
   product: ProductWithRelations;
