@@ -1,9 +1,10 @@
-'use client';
+"use client";
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { ThemeProvider } from 'next-themes';
-import { useState } from 'react';
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { ThemeProvider } from "next-themes";
+import { useState } from "react";
+import { Toaster } from "@/components/ui/sonner";
 import NavbarCliente from "@/components/cliente/NavbarCliente";
 
 interface CoreProviderProps {
@@ -33,6 +34,7 @@ export function CoreProvider({ children }: CoreProviderProps) {
         disableTransitionOnChange
       >
         {children}
+        <Toaster />
         <ReactQueryDevtools initialIsOpen={false} />
       </ThemeProvider>
     </QueryClientProvider>

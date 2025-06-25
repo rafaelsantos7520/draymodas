@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+// Cache por 1 hora - produtos só mudam quando admin edita
+export const revalidate = 3600;
+
 export async function GET(
   request: Request,
   { params }: { params: { id: string } }

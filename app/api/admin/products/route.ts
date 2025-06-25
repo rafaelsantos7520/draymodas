@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 
 export async function GET() {
   try {
@@ -108,6 +109,11 @@ export async function POST(request: Request) {
         },
       },
     });
+
+    // Revalida o cache das páginas que mostram produtos
+    revalidatePath("/catalogo");
+    revalidatePath("/");
+    revalidatePath(`/produto/${product.id}`);
 
     return NextResponse.json({
       message: "Produto criado com sucesso",

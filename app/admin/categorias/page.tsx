@@ -102,7 +102,7 @@ export default function Categorias() {
   };
 
   return (
-    <div className="container mx-auto px-2 py-6">
+    <div className="container mx-auto px-2 py-6 min-h-screen">
       <div className="bg-white rounded-lg shadow-md p-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
@@ -110,13 +110,13 @@ export default function Categorias() {
           </h1>
           <Button
             variant="default"
-            className="text-white rounded-xl w-full sm:w-auto bg-emerald-600 hover:bg-emerald-600/90"
+            className="text-white rounded-xl w-full sm:w-auto bg-brand-primary hover:bg-brand-primary/90 transition shadow-md"
             onClick={() => {
               setSelectedCategory(null);
               setIsModalOpen(true);
             }}
           >
-            <Plus className="w-4 h-4 mr-2" />
+            <Plus className="w-4 h-4 mr-2 text-white" />
             Criar Categoria
           </Button>
         </div>
@@ -140,23 +140,23 @@ export default function Categorias() {
 
                 <div className="flex flex-col gap-2">
                   <Button
-                    variant="default"
-                    className="rounded-xl w-full"
+                    variant="outline"
+                    className="bg-brand-primary text-white hover:bg-brand-primary/90 rounded-xl transition shadow-md"
                     onClick={() => {
                       setSelectedCategory(category);
                       setIsModalOpen(true);
                     }}
                   >
-                    <Pencil className="w-4 h-4 mr-2" />
+                    <Pencil className="w-4 h-4 mr-2 text-white" />
                     Editar
                   </Button>
                   <Button
                     variant="destructive"
-                    className="rounded-xl w-full"
+                    className="rounded-xl w-full text-white bg-red-500 hover:bg-red-600 transition shadow-md disabled:bg-red-300 disabled:text-white/60"
                     onClick={() => handleDeleteCategory(category.id)}
                     disabled={category.productsCount > 0}
                   >
-                    <Trash className="w-4 h-4 mr-2" />
+                    <Trash className="w-4 h-4 mr-2 text-white" />
                     Excluir
                   </Button>
                 </div>
@@ -184,22 +184,22 @@ export default function Categorias() {
                     <div className="flex gap-2">
                       <Button
                         variant="default"
-                        className="rounded-xl"
+                        className="rounded-xl bg-brand-primary text-white hover:bg-brand-primary/90 transition shadow-md"
                         onClick={() => {
                           setSelectedCategory(category);
                           setIsModalOpen(true);
                         }}
                       >
-                        <Pencil className="w-4 h-4 mr-2" />
+                        <Pencil className="w-4 h-4 mr-2 text-white" />
                         Editar
                       </Button>
                       <Button
                         variant="destructive"
-                        className="rounded-xl"
+                        className="rounded-xl text-white bg-red-500 hover:bg-red-600 transition shadow-md disabled:bg-red-300 disabled:text-white/60"
                         onClick={() => handleDeleteCategory(category.id)}
                         disabled={category.productsCount > 0}
                       >
-                        <Trash className="w-4 h-4 mr-2" />
+                        <Trash className="w-4 h-4 mr-2 text-white" />
                         Excluir
                       </Button>
                     </div>

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 
 type Params = Promise<{ id: string }>;
 
@@ -98,6 +99,11 @@ export async function PUT(request: Request, segementData: { params: Params }) {
       },
     });
 
+    // Revalida o cache das páginas que mostram produtos
+    revalidatePath("/catalogo");
+    revalidatePath("/");
+    revalidatePath(`/produto/${params.id}`);
+
     return NextResponse.json({
       message: "Produto atualizado com sucesso",
       product: updatedProduct,
@@ -111,10 +117,9 @@ export async function PUT(request: Request, segementData: { params: Params }) {
   }
 }
 
-
 export async function GET(request: Request, segementData: { params: Params }) {
   const params = await segementData.params;
-    const product = await prisma.product.findUnique({
+  const product = await prisma.product.findUnique({
     where: { id: params.id },
     include: { images: true },
   });

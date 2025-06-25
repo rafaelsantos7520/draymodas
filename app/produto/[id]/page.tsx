@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronLeft, Star, Heart, Share2 } from "lucide-react";
+import { ChevronLeft, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import useSWR from "swr";
 import { notFound } from "next/navigation";
 import { ProductGallery } from "@/components/ProductGallery";
 import { ProductDetails } from "@/components/ProductDetails";
 import { ProductCard } from "@/components/ProductCard";
+import { ShareButton } from "@/components/ShareButton";
 import { ProductWithRelations } from "@/types/product";
 import Loading from "./loading";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -33,7 +34,7 @@ export default function ProdutoPage({ params }: PageProps) {
     {
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
-      dedupingInterval: 3600000, // 1 hora
+      dedupingInterval: 900000, // 15 minutos
       errorRetryCount: 2,
       errorRetryInterval: 1000,
     }
@@ -70,6 +71,10 @@ export default function ProdutoPage({ params }: PageProps) {
   }
 
   const { product, relatedProducts } = data;
+  const productUrl =
+    typeof window !== "undefined"
+      ? window.location.href
+      : `/produto/${params.id}`;
 
   return (
     <div className="flex flex-col min-h-screen w-full py-4 md:py-8">
@@ -87,9 +92,12 @@ export default function ProdutoPage({ params }: PageProps) {
               <Button variant="outline" size="sm">
                 <Heart className="h-4 w-4" />
               </Button>
-              <Button variant="outline" size="sm">
-                <Share2 className="h-4 w-4" />
-              </Button>
+              <ShareButton
+                productName={product.name}
+                productUrl={productUrl}
+                productImage={product.images[0]?.url}
+                productPrice={product.price}
+              />
             </div>
           </div>
 

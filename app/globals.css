@@ -51,7 +51,7 @@ body {
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     --border: 152 20% 90%;
-    --input: 152 20% 90%;
+    --input: 152 20% 90%; /* branco */
     --ring: var(--brand-primary);
     --chart-1: 152 50% 60%;
     --chart-2: 152 40% 50%;
@@ -67,6 +67,7 @@ body {
     --sidebar-accent-foreground: 152 50% 25%;
     --sidebar-border: 152 20% 90%;
     --sidebar-ring: var(--brand-primary);
+    /* cores do botãoverde  */
   }
 }
 
