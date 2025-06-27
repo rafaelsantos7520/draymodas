@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-// Cache por 1 hora - produtos só mudam quando admin edita
-export const revalidate = 3600;
 
 export async function GET(
   request: Request,
@@ -66,7 +64,7 @@ export async function GET(
           },
         },
       },
-      take: 4, // Limitar a 4 produtos relacionados
+      take: 4, 
       orderBy: {
         createdAt: "desc",
       },
@@ -74,12 +72,6 @@ export async function GET(
 
     const response = NextResponse.json({ product, relatedProducts });
 
-    response.headers.set(
-      "Cache-Control",
-      "public, s-maxage=3600, stale-while-revalidate=86400"
-    );
-    response.headers.set("CDN-Cache-Control", "public, s-maxage=3600");
-    response.headers.set("Vercel-CDN-Cache-Control", "public, s-maxage=3600");
 
     return response;
   } catch (error) {

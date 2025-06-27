@@ -127,8 +127,14 @@ export async function getProductWithRelated(id: string) {
           url: true,
         },
       },
+      category: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
     },
-    take: 3,
+    take: 4,
   });
 
   return {
