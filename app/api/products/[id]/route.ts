@@ -72,9 +72,18 @@ export async function GET(
       },
     });
 
-    return NextResponse.json({ product, relatedProducts });
+    const response = NextResponse.json({ product, relatedProducts });
+
+    response.headers.set(
+      "Cache-Control",
+      "public, s-maxage=3600, stale-while-revalidate=86400"
+    );
+    response.headers.set("CDN-Cache-Control", "public, s-maxage=3600");
+    response.headers.set("Vercel-CDN-Cache-Control", "public, s-maxage=3600");
+
+    return response;
   } catch (error) {
-    console.error("❌ Erro ao buscar produto:", error);
+    console.error("Erro ao buscar produto:", error);
     return new NextResponse("Erro interno do servidor", { status: 500 });
   }
 }
