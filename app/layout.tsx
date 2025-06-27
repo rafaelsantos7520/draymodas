@@ -5,6 +5,8 @@ import { CoreProvider } from "@/components/Core-provider";
 import NavbarCliente from "@/components/cliente/NavbarCliente";
 import { AuthProvider } from "@/app/contexts/AuthContext";
 import FooterCliente from "@/components/cliente/FooterCliente";
+import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -32,7 +34,11 @@ export default function RootLayout({
       <body className={inter.className}>
         <AuthProvider>
           <NavbarCliente />
-          <CoreProvider>{children}</CoreProvider>
+          <CoreProvider>
+            {children}
+            <Analytics />
+            <SpeedInsights />
+          </CoreProvider>
         </AuthProvider>
         <FooterCliente />
       </body>
