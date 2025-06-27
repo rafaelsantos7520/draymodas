@@ -1,10 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-// Cache por 1 hora - produtos em destaque só mudam quando admin edita
 export const revalidate = 3600;
 
-export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
@@ -32,7 +30,16 @@ export async function GET() {
       },
     });
 
-    return NextResponse.json(products);
+    const response = NextResponse.json(products);
+
+    response.headers.set(
+      "Cache-Control",
+      "public, s-maxage=3600, stale-while-revalidate=86400"
+    );
+    response.headers.set("CDN-Cache-Control", "public, s-maxage=3600");
+    response.headers.set("Vercel-CDN-Cache-Control", "public, s-maxage=3600");
+
+    return response;
   } catch (error) {
     console.error("Erro ao buscar produtos em destaque:", error);
     return NextResponse.json(

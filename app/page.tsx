@@ -8,7 +8,6 @@ import { getCategories } from "@/lib/services/category.service";
 import { ProductWithRelations } from "@/types/product";
 import { HeroBanner } from "@/components/HeroBanner";
 
-// Cache por 5 minutos para melhorar performance
 export const revalidate = 300;
 
 export default async function Home() {
