@@ -1,4 +1,3 @@
-"use client";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { ProductList } from "@/components/admin/ProductListTable";
@@ -10,28 +9,12 @@ import type {
   ProductSize,
   Image,
 } from "@prisma/client";
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { getProducts } from "@/lib/services/product.service";
 
-type ProductWithRelations = Product & {
-  category: Category;
-  images: Image[];
-  sizes: (ProductSize & {
-    size: Size;
-  })[];
-};
 
-export default function Page() {
-  const [products, setProducts] = useState<ProductWithRelations[]>([]);
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      const response = await axios.get("/api/admin/products");
-      setProducts(response.data);
-    };
-
-    fetchProducts();
-  }, []);
+export default async function Page() {
+  const products = await getProducts();
 
   return (
     <div className="container mx-auto px-4 py-6 min-h-screen">
