@@ -8,10 +8,6 @@ import { ShareButton } from "@/components/ShareButton";
 import { ProductWithRelations } from "@/types/product";
 import { getProductWithRelated } from "@/lib/services/product.service";
 
-interface ProductResponse {
-  product: ProductWithRelations;
-  relatedProducts: ProductWithRelations[];
-}
 
 interface PageProps {
   params: {

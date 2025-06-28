@@ -27,10 +27,6 @@ export function ProductDetails({
           <Badge variant="secondary" className="text-xs">
             {category?.name}
           </Badge>
-          <div className="flex items-center gap-1">
-            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-            <span className="text-sm text-gray-600">4.8 (127 avaliações)</span>
-          </div>
         </div>
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-900">
           {name}
