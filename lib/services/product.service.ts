@@ -56,7 +56,7 @@ export async function getProductById(id: string) {
   return product ? formatProduct(product) : null;
 }
 
-export async function getProducts() {
+export async function getProducts(quantity: number = 8) {
   const products = await prisma.product.findMany({
     where: {
       isActive: true,
@@ -75,7 +75,7 @@ export async function getProducts() {
         },
       },
     },
-    take: 8,
+    take: quantity,
     orderBy: {
       createdAt: "desc",
     },

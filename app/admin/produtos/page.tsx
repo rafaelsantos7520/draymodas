@@ -2,19 +2,12 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { ProductList } from "@/components/admin/ProductListTable";
 import Link from "next/link";
-import type {
-  Product,
-  Category,
-  Size,
-  ProductSize,
-  Image,
-} from "@prisma/client";
 import { getProducts } from "@/lib/services/product.service";
 
 
 
 export default async function Page() {
-  const products = await getProducts();
+  const products = await getProducts(100);
 
   return (
     <div className="container mx-auto px-4 py-6 min-h-screen">
